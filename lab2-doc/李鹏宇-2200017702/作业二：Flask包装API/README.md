@@ -80,7 +80,9 @@ curl -X PUT http://127.0.0.1:5000/todos/1 -H "Content-Type: application/json" -d
 
 ## 4. 注意事项
 - Windows PowerShell 下建议用 `curl.exe` 替代 `curl`，或用 `Invoke-WebRequest`。
+- Terminal 可以直接运行 `curl` 命令。
 - JSON 数据建议用双引号，避免转义问题。
+- curl 命令中 JSON 数据需用反斜杠转义双引号。
 - 先运行 `python app.py`，再用 curl 测试。
 
 ## 5. 备注
