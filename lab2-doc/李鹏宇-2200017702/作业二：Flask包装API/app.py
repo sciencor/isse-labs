@@ -1,9 +1,8 @@
+#这里是将TodoList类函数改为api服务的脚本文件
+
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-app.config['JSON_AS_ASCII'] = False
-
-#这里是将TodoList类函数改为api服务的脚本文件
 
 class TodoList:
     def __init__(self):
