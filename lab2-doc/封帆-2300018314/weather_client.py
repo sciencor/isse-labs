@@ -1,4 +1,5 @@
 import os
+import json
 from dotenv import load_dotenv
 import requests
 load_dotenv()
@@ -17,4 +18,5 @@ params = {
 response = requests.get(url=host+uri, params=params)
 
 if response:
-    print(response.json())
+    with open("./lab2-doc/weather.json", "w", encoding="utf-8") as f:
+        json.dump(response.json(), f, ensure_ascii=False, indent=2)

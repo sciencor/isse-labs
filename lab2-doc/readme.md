@@ -1,4 +1,9 @@
-## 作业要求
-1. 将weather_client.py、app.py和截图（or 任何你想给助教展示的东西）放到同一个文件夹内，文件夹命名为姓名-学号
-2. 将此文件夹放到仓库lab2-doc/下，格式参考`李华-23011xxxx`
-3. 发起PR，助教看到后会merge到仓库
+# RESTful API课堂作业
+
+> Created by 封帆 2300018314
+
+## 作业1 - 第三方API调用
+
+调用百度地图API获取北京市海淀区天气信息，以JSON格式获取全部字段，输出到**lab2-doc/weather**。[查看运行结果](/lab2-doc/weather.json)
+
+## 作业2 - 封装自己的API服务
