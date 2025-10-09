@@ -1,7 +1,11 @@
+import json
 from math import e
+import re
+from urllib import response
 from flask import Flask, request, jsonify, g, current_app
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False  # 解决中文乱码问题
 
 class TodoList:
     # 二级分组功能（未实现）
@@ -46,12 +50,15 @@ def index():
     return "Welcome to the ToDo List API!<p>I'm DJ, a student of <i>ISSE</i>.</p>"
 
 @app.route('/show_todos', methods=['GET', 'POST'])
-def get_todos():
+def show_todos():
     res = {"name": "my_list_1", "items": "这是一个空列表"}
     if isinstance(current_app.my_list_1, TodoList):
         res["items"] = current_app.my_list_1.get_items()
-    print(current_app.my_list_1.get_items())
-    return jsonify(res)
+
+    # # print(current_app.my_list_1.get_items())
+    response = jsonify(res)
+
+    return response
 
 @app.route('/add_todo', methods=['GET', 'POST'])
 def add_todo():
@@ -63,10 +70,13 @@ def add_todo():
         task = request.forms.get('task')
     if task is not None:
         res = current_app.my_list_1.add_item(task)
-        print(res)
-        return jsonify(res)
-    print("Invalid input")
+        response = jsonify(res)
+        # print(res)
+
+        return response
+    # print("Invalid input")
     return jsonify({"error": "Invalid input"})
+
 
 @app.route('/remove_todo', methods=['GET', 'POST'])
 def remove_todo():
@@ -75,18 +85,23 @@ def remove_todo():
     except ValueError:
         id = int(request.forms.get('id'))
     except:
-        print("Invalid input")
+        # print("Invalid input")
         return jsonify({"error": "Invalid input"})
 
     if current_app.my_list_1 is None :
         return jsonify({"error": "List not found, please check list name or initialize a todolist first."})
     try:
-        response = current_app.my_list_1.remove_item(id)
-        print(response)
-        return jsonify({"poped_id": response})
+        poped = current_app.my_list_1.remove_item(id)
+        response = jsonify(poped)
+
+        # print(response)
+        return response
     except Exception as e:
-        print(e)
-        return jsonify({"error": str(e)})
+        # print(e)
+        response = jsonify({"error": str(e)})
+
+
+        return response
 
 @app.route('/update_todo', methods=['GET', 'POST'])
 def update_todo():
@@ -97,17 +112,20 @@ def update_todo():
         id = int(request.forms.get('id'))
         task = request.forms.get('task')
     except:
-        print("Invalid input")
+        # print("Invalid input")
         return jsonify({"error": "Invalid input"})
 
     if current_app.my_list_1 is None :
         return jsonify({"error": "List not found, please check list name or initialize a todolist first."})
     try:
-        response = current_app.my_list_1.update_item(id, task)
-        print(response)
-        return jsonify(response)
+        res = current_app.my_list_1.update_item(id, task)
+        response = jsonify(res)
+
+        return response
     except Exception as e:
-        return jsonify({"error": str(e)})
+        response = jsonify({"error": str(e)})
+
+        return response
 
 if __name__ == '__main__':
 
