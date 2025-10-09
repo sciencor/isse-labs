@@ -45,7 +45,7 @@ def before_request():
 def index():
     return "Welcome to the ToDo List API!<p>I'm DJ, a student of <i>ISSE</i>.</p>"
 
-@app.route('/todos', methods=['GET', 'POST'])
+@app.route('/show_todos', methods=['GET', 'POST'])
 def get_todos():
     res = {"name": "my_list_1", "items": "这是一个空列表"}
     if isinstance(current_app.my_list_1, TodoList):
