@@ -1,3 +1,5 @@
+.history
+.isse-venv
 .env
 *.pdf
 API_KEY.env
