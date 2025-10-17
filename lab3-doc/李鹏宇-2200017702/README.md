@@ -46,7 +46,13 @@ python app.py
 后端服务将运行在 `http://localhost:5000`
 
 ### 2. 打开前端页面
-在浏览器中打开 `project/index.html` 文件，或使用 Live Server 等工具。
+**方式1（推荐）**: 使用VS Code的Live Server插件
+1. 右键点击 `index.html`
+2. 选择 "Open with Live Server"
+
+**方式2**: 直接在浏览器中打开
+1. 在浏览器地址栏输入文件路径
+2. 例如: `file:///d:/智能化软件系统与工程/LAB/isse-labs/lab3-doc/李鹏宇-2200017702/project/index.html`
 
 ## 📡 API 接口文档
 
