@@ -52,7 +52,10 @@ python app.py
 
 **方式2**: 直接在浏览器中打开
 1. 在浏览器地址栏输入文件路径
-2. 例如: `file:///d:/智能化软件系统与工程/LAB/isse-labs/lab3-doc/李鹏宇-2200017702/project/index.html`
+2. 例如（更通用的写法，注意区分大小写与斜杠方向）:
+  - Windows: `file:///D:/智能化软件系统与工程/LAB/isse-labs/lab3-doc/李鹏宇-2200017702/project/index.html`
+  - macOS/Linux: `file:///Users/<你的用户名>/isse-labs/lab3-doc/李鹏宇-2200017702/project/index.html`
+  - 或者直接将 `index.html` 文件拖到浏览器窗口中打开
 
 ## 📡 API 接口文档
 
