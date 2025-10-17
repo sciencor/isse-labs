@@ -1,0 +1,34 @@
+我正在用 Flask（后端） + HTML/CSS/JavaScript（前端） 设计一个 TodoList 任务管理系统，要求实现以下功能：
+1. 用户可输入新的待办事项；
+2. 待办事项展示在列表中；
+3. 可删除任务；
+4. 可标记任务为完成；
+5. 任务可按照优先级分类（高/中/低）；
+6. 任务可按类别（学习/工作/生活）进行分类与筛选。
+
+请你帮我完成第一步
+
+第一步：
+后端接口设计
+1. 设计 Flask 后端，包含以下路由：
+  - GET /tasks：获取全部任务；
+  - POST /tasks：新增任务；
+  - PUT /tasks/<id>：修改任务状态（完成/未完成）；
+  - DELETE /tasks/<id>：删除任务；
+  - 可选：GET /tasks?category=xxx、GET /tasks?priority=high 支持筛选。
+2. 每个任务对象字段如下：
+{
+  "id": 1,
+  "title": "写实验报告",
+  "category": "学习",
+  "priority": "高",
+  "completed": false
+}
+3. 暂不使用数据库，用内存列表（或 JSON 文件）模拟存储。
+4. 后端返回统一格式：
+{
+  "status": "success",
+  "data": [...],
+  "message": "新增成功"
+}
+5. 编写 app.py，测试接口在 Postman 或浏览器中能正常返回。
