@@ -283,6 +283,15 @@ async function deleteTask(taskId) {
 // ==================== 切换任务状态 ====================
 async function toggleTaskStatus(taskId, completed) {
     try {
+        // 如果是标记为完成，先播放庆祝动画
+        if (completed) {
+            const taskCard = document.getElementById(`task-${taskId}`);
+            if (taskCard) {
+                // 触发庆祝特效
+                await playCelebrationAnimation(taskCard);
+            }
+        }
+        
         const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
             method: 'PUT',
             headers: {
@@ -294,7 +303,7 @@ async function toggleTaskStatus(taskId, completed) {
         const result = await response.json();
         
         if (result.status === 'success') {
-            showToast(completed ? '任务已完成！' : '任务已恢复', 'success');
+            showToast(completed ? '🎉 太棒了！任务已完成！' : '任务已恢复', 'success');
             await loadTasks();
         } else {
             showToast(result.message || '更新任务失败', 'error');
@@ -415,6 +424,141 @@ function showToast(message, type = 'success') {
     setTimeout(() => {
         toast.classList.remove('show');
     }, 3000);
+}
+
+// ==================== 庆祝动画 ====================
+async function playCelebrationAnimation(taskCard) {
+    return new Promise((resolve) => {
+        // 获取任务卡片的位置
+        const rect = taskCard.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        // 添加脉冲动画类
+        taskCard.classList.add('completing');
+        
+        // 创建星星爆炸效果
+        createStarBurst(taskCard, centerX, centerY);
+        
+        // 创建彩色粒子
+        createParticles(centerX, centerY);
+        
+        // 创建彩带效果
+        createRibbons(centerX, centerY);
+        
+        // 动画持续时间
+        setTimeout(() => {
+            taskCard.classList.remove('completing');
+            resolve();
+        }, 1000);
+    });
+}
+
+// 创建星星爆炸效果
+function createStarBurst(taskCard, centerX, centerY) {
+    const starBurst = document.createElement('div');
+    starBurst.className = 'star-burst';
+    taskCard.appendChild(starBurst);
+    
+    // 创建 8 个星星向四周发射
+    const starCount = 8;
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        
+        const angle = (Math.PI * 2 * i) / starCount;
+        const distance = 80;
+        const xDist = Math.cos(angle) * distance;
+        const yDist = Math.sin(angle) * distance;
+        
+        star.style.setProperty('--x-dist', `${xDist}px`);
+        star.style.setProperty('--y-dist', `${yDist}px`);
+        star.style.animationDelay = `${i * 0.05}s`;
+        
+        starBurst.appendChild(star);
+    }
+    
+    // 动画结束后移除
+    setTimeout(() => {
+        starBurst.remove();
+    }, 1000);
+}
+
+// 创建彩色粒子效果
+function createParticles(centerX, centerY) {
+    const colors = [
+        '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+        '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
+        '#52D858', '#FF85A1', '#FFC952', '#47B8E0'
+    ];
+    
+    const particleCount = 30;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.position = 'fixed';
+        particle.style.left = `${centerX}px`;
+        particle.style.top = `${centerY}px`;
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.zIndex = '10000';
+        
+        // 随机方向和距离
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 80 + Math.random() * 120;
+        const xPos = Math.cos(angle) * distance;
+        const yPos = Math.sin(angle) * distance;
+        
+        particle.style.setProperty('--x-pos', `${xPos}px`);
+        particle.style.setProperty('--y-pos', `${yPos}px`);
+        particle.style.animationDelay = `${Math.random() * 0.1}s`;
+        
+        document.body.appendChild(particle);
+        
+        // 动画结束后移除
+        setTimeout(() => {
+            particle.remove();
+        }, 1000);
+    }
+}
+
+// 创建彩带效果
+function createRibbons(centerX, centerY) {
+    const colors = [
+        '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+        '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'
+    ];
+    
+    const ribbonCount = 20;
+    
+    for (let i = 0; i < ribbonCount; i++) {
+        const ribbon = document.createElement('div');
+        ribbon.className = 'ribbon';
+        ribbon.style.position = 'fixed';
+        ribbon.style.left = `${centerX}px`;
+        ribbon.style.top = `${centerY}px`;
+        ribbon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        ribbon.style.zIndex = '10000';
+        
+        // 随机方向和距离
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 60 + Math.random() * 150;
+        const xPos = Math.cos(angle) * distance;
+        const yPos = Math.sin(angle) * distance - 50; // 稍微向上偏移
+        const rotation = Math.random() * 720 - 360;
+        
+        ribbon.style.setProperty('--ribbon-x', `${xPos}px`);
+        ribbon.style.setProperty('--ribbon-y', `${yPos}px`);
+        ribbon.style.setProperty('--ribbon-rotate', `${rotation}deg`);
+        ribbon.style.animationDelay = `${Math.random() * 0.15}s`;
+        
+        document.body.appendChild(ribbon);
+        
+        // 动画结束后移除
+        setTimeout(() => {
+            ribbon.remove();
+        }, 1400);
+    }
 }
 
 // ==================== 工具函数 ====================

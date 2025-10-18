@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 import json
 import os
 from datetime import datetime
+from flask_cors import CORS
 
 
 class TodoList:
@@ -110,6 +111,7 @@ class TodoList:
 
 todoList = TodoList()
 app = Flask(__name__)
+CORS(app)
 app.config["JSON_AS_ASCII"] = False
 
 
