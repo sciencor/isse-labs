@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList - 任务管理系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 TodoList 任务管理</h1>
+            <div class="stats">
+                <span id="total-count">总计: 0</span>
+                <span id="completed-count">已完成: 0</span>
+                <span id="pending-count">待办: 0</span>
+            </div>
+        </header>
+
+        <!-- 添加新任务表单 -->
+        <div class="add-todo-form">
+            <div class="form-row">
+                <input type="text" id="todo-title" placeholder="输入任务标题..." maxlength="100">
+                <button id="add-btn">添加任务</button>
+            </div>
+            <div class="form-row">
+                <textarea id="todo-description" placeholder="任务描述（可选）" rows="2"></textarea>
+            </div>
+            <div class="form-row">
+                <select id="todo-priority">
+                    <option value="low">低优先级</option>
+                    <option value="medium">中优先级</option>
+                    <option value="high">高优先级</option>
+                </select>
+                <input type="text" id="todo-category" placeholder="分类（可选）" maxlength="20">
+            </div>
+        </div>
+
+        <!-- 筛选和排序 -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>按分类筛选:</label>
+                <select id="filter-category">
+                    <option value="">所有分类</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>按优先级筛选:</label>
+                <select id="filter-priority">
+                    <option value="">所有优先级</option>
+                    <option value="high">高优先级</option>
+                    <option value="medium">中优先级</option>
+                    <option value="low">低优先级</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>状态筛选:</label>
+                <select id="filter-status">
+                    <option value="">全部</option>
+                    <option value="pending">待办</option>
+                    <option value="completed">已完成</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 任务列表 -->
+        <div class="todos-container">
+            <ul id="todos-list"></ul>
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <p>暂无任务，添加一个新任务开始吧！</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑任务模态框 -->
+    <div id="edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑任务</h3>
+                <span class="close" id="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-todo-id">
+                <div class="form-group">
+                    <label>标题:</label>
+                    <input type="text" id="edit-todo-title" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label>描述:</label>
+                    <textarea id="edit-todo-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>优先级:</label>
+                    <select id="edit-todo-priority">
+                        <option value="low">低优先级</option>
+                        <option value="medium">中优先级</option>
+                        <option value="high">高优先级</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>分类:</label>
+                    <input type="text" id="edit-todo-category" maxlength="20">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-edit-btn" class="btn-primary">保存</button>
+                <button id="cancel-edit-btn" class="btn-secondary">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
