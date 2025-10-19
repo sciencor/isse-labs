@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, jsonify
 from enum import Enum
 from datetime import datetime
+from functools import wraps
 
 class Priority(Enum):
-    LOW = 0
-    MEDIUM = 1
-    HIGH = 2
+    LOW = "低"
+    MEDIUM = "中"
+    HIGH = "高"
 
 class ToDoList:
     def __init__(self, content: str, category: str = "默认", priority: Priority = Priority.MEDIUM):
@@ -60,6 +61,26 @@ app = Flask(__name__)
 
 # 配置JSON响应不转义非ASCII字符
 app.json.ensure_ascii = False
+
+# CORS处理装饰器
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    return response
+
+# 应用CORS处理
+app.after_request(add_cors_headers)
+
+# 处理OPTIONS预检请求
+@app.before_request
+def handle_options():
+    if request.method == 'OPTIONS':
+        response = jsonify({'status': 'ok'})
+        response.headers['Access-Control-Allow-Origin'] = '*'  
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        return response
 
 # 存储待办事项的列表
 todo_items = []
