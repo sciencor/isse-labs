@@ -516,3 +516,4 @@ function showSuccess(message) {
         setTimeout(() => successEl.remove(), 300);
     }, 1500);
 }
+
