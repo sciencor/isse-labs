@@ -27,7 +27,9 @@ pip install flask
 ```bash
 python lab3-doc/封帆-2300018314/project/app.py
 ```
-服务默认监听在 `http://localhost:5000`，根路径 `/` 返回健康检查。
+
+服务默认监听在 `http://localhost:5000`。根路径 `/` 会返回前端页面，若只需检查后端健康状态可访问 `/api/health`。
+
 
 ### API 简表
 | 方法 | 路径 | 说明 | 备注 |
@@ -66,7 +68,9 @@ curl -s -X DELETE http://localhost:5000/api/tasks/1 | jq
 
 ## 前端使用
 1. **启动后端**：确保 Flask 服务在 `http://localhost:5000` 运行。
-2. **打开页面**：使用浏览器直接打开 `lab3-doc/封帆-2300018314/project/index.html`（建议使用 VS Code Live Server 或 `python -m http.server` 在该目录启动静态服务）。
+
+2. **打开页面**：浏览器访问 `http://localhost:5000/`，后端会直接返回静态前端文件。
+
 3. **主要区域说明**：
    - 顶部「新增任务」表单：填写标题（必填）、分类、优先级后点击「添加任务」。
    - 「筛选与排序」面板：可切换状态（全部/进行中/已完成）、输入分类关键字（实时生效）、选择排序字段与顺序、点击「刷新」强制重新拉取。
