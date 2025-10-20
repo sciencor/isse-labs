@@ -7,10 +7,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 
 
-DATA_FILE = Path(__file__).resolve().parent / "tasks.json"
+BASE_DIR = Path(__file__).resolve().parent
+DATA_FILE = BASE_DIR / "tasks.json"
 DEFAULT_CATEGORY = "General"
 DEFAULT_PRIORITY = 2
 
@@ -189,7 +190,22 @@ def handle_unexpected_error(err: Exception):
 
 
 @app.get("/")
-def health_check():
+def serve_index():
+    return send_from_directory(BASE_DIR, "index.html")
+
+
+@app.get("/script.js")
+def serve_script():
+    return send_from_directory(BASE_DIR, "script.js")
+
+
+@app.get("/style.css")
+def serve_style():
+    return send_from_directory(BASE_DIR, "style.css")
+
+
+@app.get("/api/health")
+def api_health():
     return api_success("backend running")
 
 
