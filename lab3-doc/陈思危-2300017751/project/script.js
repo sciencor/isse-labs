@@ -3,22 +3,28 @@ const API_BASE = 'http://localhost:5000/api';
 
 // DOM 元素
 const todosList = document.getElementById('todos-list');
+const completedTodosList = document.getElementById('completed-todos');
 const todoTitle = document.getElementById('todo-title');
 const todoDescription = document.getElementById('todo-description');
 const todoPriority = document.getElementById('todo-priority');
 const todoCategory = document.getElementById('todo-category');
+const todoDeadline = document.getElementById('todo-deadline');
 const addBtn = document.getElementById('add-btn');
 const emptyState = document.getElementById('empty-state');
+const completedIndicator = document.getElementById('completed-indicator');
+const completedTasksList = document.getElementById('completed-tasks-list');
+const completedCountBadge = document.getElementById('completed-count-badge');
 
 // 筛选元素
 const filterCategory = document.getElementById('filter-category');
 const filterPriority = document.getElementById('filter-priority');
 const filterStatus = document.getElementById('filter-status');
+const sortBy = document.getElementById('sort-by');
 
 // 统计元素
 const totalCount = document.getElementById('total-count');
-const completedCount = document.getElementById('completed-count');
 const pendingCount = document.getElementById('pending-count');
+const overdueCount = document.getElementById('overdue-count');
 
 // 模态框元素
 const editModal = document.getElementById('edit-modal');
@@ -28,6 +34,7 @@ const editTodoTitle = document.getElementById('edit-todo-title');
 const editTodoDescription = document.getElementById('edit-todo-description');
 const editTodoPriority = document.getElementById('edit-todo-priority');
 const editTodoCategory = document.getElementById('edit-todo-category');
+const editTodoDeadline = document.getElementById('edit-todo-deadline');
 const saveEditBtn = document.getElementById('save-edit-btn');
 const cancelEditBtn = document.getElementById('cancel-edit-btn');
 
@@ -36,7 +43,8 @@ let allTodos = [];
 let currentFilters = {
     category: '',
     priority: '',
-    status: ''
+    status: '',
+    sortBy: 'deadline'
 };
 
 // 初始化
@@ -48,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 设置事件监听器
 function setupEventListeners() {
+    // 添加任务
     addBtn.addEventListener('click', addTodo);
     todoTitle.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') addTodo();
@@ -69,6 +78,14 @@ function setupEventListeners() {
         applyFilters();
     });
     
+    sortBy.addEventListener('change', function() {
+        currentFilters.sortBy = this.value;
+        applyFilters();
+    });
+    
+    // 已完成任务区域折叠/展开
+    completedIndicator.addEventListener('click', toggleCompletedTasks);
+    
     // 模态框事件
     closeModal.addEventListener('click', closeEditModal);
     cancelEditBtn.addEventListener('click', closeEditModal);
@@ -85,7 +102,10 @@ function setupEventListeners() {
 // 加载所有todos
 async function loadTodos() {
     try {
-        const response = await fetch(`${API_BASE}/todos`);
+        const params = new URLSearchParams();
+        params.append('sort_by', currentFilters.sortBy);
+        
+        const response = await fetch(`${API_BASE}/todos?${params.toString()}`);
         if (response.ok) {
             allTodos = await response.json();
             applyFilters();
@@ -105,6 +125,10 @@ async function loadCategories() {
         const response = await fetch(`${API_BASE}/categories`);
         if (response.ok) {
             const categories = await response.json();
+            // 确保默认分类在列表中
+            if (!categories.includes('默认分类')) {
+                categories.unshift('默认分类');
+            }
             updateCategoryFilter(categories);
         }
     } catch (error) {
@@ -114,13 +138,9 @@ async function loadCategories() {
 
 // 更新分类筛选下拉框
 function updateCategoryFilter(categories) {
-    // 保存当前选中的值
     const currentValue = filterCategory.value;
-    
-    // 清空选项（保留第一个"所有分类"选项）
     filterCategory.innerHTML = '<option value="">所有分类</option>';
     
-    // 添加分类选项
     categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
@@ -128,41 +148,67 @@ function updateCategoryFilter(categories) {
         filterCategory.appendChild(option);
     });
     
-    // 恢复之前选中的值
     filterCategory.value = currentValue;
 }
 
-// 应用筛选
+// 应用筛选（主列表只显示未完成任务）
 function applyFilters() {
-    let filteredTodos = [...allTodos];
+    // 分离已完成和未完成任务
+    const completedTodos = allTodos.filter(todo => todo.completed);
+    let pendingTodos = allTodos.filter(todo => !todo.completed);
     
-    // 按分类筛选
+    // 筛选未完成任务
     if (currentFilters.category) {
-        filteredTodos = filteredTodos.filter(todo => 
+        pendingTodos = pendingTodos.filter(todo => 
             todo.category === currentFilters.category
         );
     }
     
-    // 按优先级筛选
     if (currentFilters.priority) {
-        filteredTodos = filteredTodos.filter(todo => 
+        pendingTodos = pendingTodos.filter(todo => 
             todo.priority === currentFilters.priority
         );
     }
     
-    // 按状态筛选
     if (currentFilters.status) {
-        if (currentFilters.status === 'completed') {
-            filteredTodos = filteredTodos.filter(todo => todo.completed);
-        } else if (currentFilters.status === 'pending') {
-            filteredTodos = filteredTodos.filter(todo => !todo.completed);
-        }
+        pendingTodos = pendingTodos.filter(todo => 
+            todo.status === currentFilters.status
+        );
     }
     
-    renderTodos(filteredTodos);
+    // 排序
+    pendingTodos.sort(getSortFunction());
+    completedTodos.sort(getSortFunction());
+    
+    // 渲染列表
+    renderTodos(pendingTodos);
+    renderCompletedTodos(completedTodos);
+    
+    // 更新已完成任务计数
+    completedCountBadge.textContent = completedTodos.length;
+    // 控制已完成区域显示
+    document.querySelector('.completed-tasks-section').style.display = 
+        completedTodos.length > 0 ? 'block' : 'none';
 }
 
-// 渲染todos列表
+// 获取排序函数
+function getSortFunction() {
+    return (a, b) => {
+        if (currentFilters.sortBy === 'deadline') {
+            return new Date(a.deadline || '') - new Date(b.deadline || '');
+        }
+        if (currentFilters.sortBy === 'priority') {
+            const priorityOrder = { high: 3, medium: 2, low: 1 };
+            return priorityOrder[b.priority] - priorityOrder[a.priority];
+        }
+        if (currentFilters.sortBy === 'title') {
+            return a.title.localeCompare(b.title);
+        }
+        return 0;
+    };
+}
+
+// 渲染待办任务列表
 function renderTodos(todos) {
     todosList.innerHTML = '';
     
@@ -174,24 +220,50 @@ function renderTodos(todos) {
     emptyState.style.display = 'none';
     
     todos.forEach(todo => {
-        const todoItem = createTodoElement(todo);
+        const todoItem = createTodoElement(todo, false);
         todosList.appendChild(todoItem);
     });
 }
 
-// 创建单个todo元素
-function createTodoElement(todo) {
+// 渲染已完成任务列表
+function renderCompletedTodos(todos) {
+    completedTodosList.innerHTML = '';
+    
+    todos.forEach(todo => {
+        const todoItem = createTodoElement(todo, true);
+        completedTodosList.appendChild(todoItem);
+    });
+}
+
+// 创建单个任务元素
+function createTodoElement(todo, isCompleted) {
     const li = document.createElement('li');
-    li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+    li.className = `todo-item ${isCompleted ? 'completed' : ''}`;
+    if (todo.status && !isCompleted) li.classList.add(`status-${todo.status}`);
     
     const priorityClass = `priority-${todo.priority}`;
-    const toggleText = todo.completed ? '取消完成' : '标记完成';
-    const toggleClass = todo.completed ? 'completed' : '';
+    const toggleText = isCompleted ? '取消完成' : '标记完成';
+    const toggleClass = isCompleted ? 'completed' : '';
+    
+    // 构建截止日期显示
+    let deadlineHtml = '';
+    if (todo.deadline) {
+        const deadlineDate = new Date(todo.deadline);
+        const formattedDate = deadlineDate.toLocaleDateString('zh-CN');
+        
+        // 未完成任务才检查过期
+        const isOverdue = !isCompleted && deadlineDate < new Date() && 
+                         new Date(deadlineDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
+        
+        deadlineHtml = `<span class="deadline-badge ${isOverdue ? 'overdue' : ''}">
+                        截止: ${formattedDate}
+                      </span>`;
+    }
     
     li.innerHTML = `
         <div class="todo-header">
             <div class="todo-content">
-                <div class="todo-title ${todo.completed ? 'completed' : ''}">
+                <div class="todo-title ${isCompleted ? 'completed' : ''}">
                     ${escapeHtml(todo.title)}
                 </div>
                 ${todo.description ? `<div class="todo-description">${escapeHtml(todo.description)}</div>` : ''}
@@ -199,8 +271,8 @@ function createTodoElement(todo) {
                     <span class="priority-badge ${priorityClass}">
                         ${getPriorityText(todo.priority)}
                     </span>
-                    <span class="category-badge">${escapeHtml(todo.category)}</span>
-                    <span class="created-time">创建于 ${formatDate(todo.created_at)}</span>
+                    <span class="category-badge">${escapeHtml(todo.category || '默认分类')}</span>
+                    ${deadlineHtml}
                 </div>
             </div>
             <div class="todo-actions">
@@ -220,7 +292,14 @@ function createTodoElement(todo) {
     return li;
 }
 
-// 添加新todo
+// 切换已完成任务区域显示/隐藏
+function toggleCompletedTasks() {
+    const isVisible = completedTasksList.style.display !== 'none';
+    completedTasksList.style.display = isVisible ? 'none' : 'block';
+    document.querySelector('.toggle-icon').textContent = isVisible ? '▼' : '▲';
+}
+
+// 添加新任务（分类默认值处理）
 async function addTodo() {
     const title = todoTitle.value.trim();
     if (!title) {
@@ -228,11 +307,15 @@ async function addTodo() {
         return;
     }
     
+    // 分类为空时设置为默认分类
+    const category = todoCategory.value.trim() || '默认分类';
+    
     const todoData = {
         title: title,
         description: todoDescription.value.trim(),
         priority: todoPriority.value,
-        category: todoCategory.value.trim() || '默认'
+        category: category,
+        deadline: todoDeadline.value ? new Date(todoDeadline.value).toISOString().split('T')[0] : null
     };
     
     try {
@@ -250,6 +333,7 @@ async function addTodo() {
             todoDescription.value = '';
             todoPriority.value = 'low';
             todoCategory.value = '';
+            todoDeadline.value = '';
             
             // 重新加载数据
             await loadTodos();
@@ -265,7 +349,7 @@ async function addTodo() {
     }
 }
 
-// 切换todo完成状态
+// 切换任务完成状态
 async function toggleTodo(id) {
     try {
         const response = await fetch(`${API_BASE}/todos/${id}/toggle`, {
@@ -274,7 +358,6 @@ async function toggleTodo(id) {
         
         if (response.ok) {
             await loadTodos();
-            showSuccess('状态更新成功');
         } else {
             showError('更新状态失败');
         }
@@ -284,12 +367,8 @@ async function toggleTodo(id) {
     }
 }
 
-// 删除todo
+// 删除任务
 async function deleteTodo(id) {
-    if (!confirm('确定要删除这个任务吗？')) {
-        return;
-    }
-    
     try {
         const response = await fetch(`${API_BASE}/todos/${id}`, {
             method: 'DELETE'
@@ -298,7 +377,7 @@ async function deleteTodo(id) {
         if (response.ok) {
             await loadTodos();
             await loadCategories();
-            showSuccess('任务删除成功');
+            showSuccess('任务已删除');
         } else {
             showError('删除任务失败');
         }
@@ -308,7 +387,7 @@ async function deleteTodo(id) {
     }
 }
 
-// 编辑todo
+// 编辑任务（分类默认值处理）
 function editTodo(id) {
     const todo = allTodos.find(t => t.id === id);
     if (!todo) return;
@@ -317,17 +396,19 @@ function editTodo(id) {
     editTodoTitle.value = todo.title;
     editTodoDescription.value = todo.description || '';
     editTodoPriority.value = todo.priority;
-    editTodoCategory.value = todo.category;
+    editTodoCategory.value = todo.category || ''; // 回显当前分类，为空时显示空
+    
+    // 设置截止日期
+    if (todo.deadline) {
+        editTodoDeadline.value = todo.deadline.split('T')[0];
+    } else {
+        editTodoDeadline.value = '';
+    }
     
     editModal.style.display = 'flex';
 }
 
-// 关闭编辑模态框
-function closeEditModal() {
-    editModal.style.display = 'none';
-}
-
-// 保存编辑
+// 保存编辑（分类默认值处理）
 async function saveEdit() {
     const id = parseInt(editTodoId.value);
     const title = editTodoTitle.value.trim();
@@ -337,11 +418,15 @@ async function saveEdit() {
         return;
     }
     
-    const todoData = {
+    // 分类为空时设置为默认分类
+    const category = editTodoCategory.value.trim() || '默认分类';
+    
+    const updatedData = {
         title: title,
         description: editTodoDescription.value.trim(),
         priority: editTodoPriority.value,
-        category: editTodoCategory.value.trim() || '默认'
+        category: category,
+        deadline: editTodoDeadline.value ? new Date(editTodoDeadline.value).toISOString().split('T')[0] : null
     };
     
     try {
@@ -350,14 +435,14 @@ async function saveEdit() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(todoData)
+            body: JSON.stringify(updatedData)
         });
         
         if (response.ok) {
             closeEditModal();
             await loadTodos();
             await loadCategories();
-            showSuccess('任务更新成功');
+            showSuccess('任务已更新');
         } else {
             const error = await response.json();
             showError(error.error || '更新任务失败');
@@ -368,84 +453,66 @@ async function saveEdit() {
     }
 }
 
+// 关闭编辑模态框
+function closeEditModal() {
+    editModal.style.display = 'none';
+}
+
 // 更新统计信息
 function updateStats() {
     const total = allTodos.length;
     const completed = allTodos.filter(todo => todo.completed).length;
     const pending = total - completed;
+    const overdue = allTodos.filter(todo => !todo.completed && todo.status === 'overdue').length;
     
     totalCount.textContent = `总计: ${total}`;
-    completedCount.textContent = `已完成: ${completed}`;
     pendingCount.textContent = `待办: ${pending}`;
+    overdueCount.textContent = `过期: ${overdue}`;
 }
 
-// 工具函数
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+// 工具函数 - 转义HTML
+function escapeHtml(unsafe) {
+    if (!unsafe) return '';
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
+// 工具函数 - 获取优先级文本
 function getPriorityText(priority) {
-    const texts = {
-        'high': '高',
-        'medium': '中',
-        'low': '低'
+    const map = {
+        'high': '高优先级',
+        'medium': '中优先级',
+        'low': '低优先级'
     };
-    return texts[priority] || '低';
+    return map[priority] || priority;
 }
 
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
-
-function showSuccess(message) {
-    // 简单的成功提示
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #28a745;
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        z-index: 10000;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        document.body.removeChild(toast);
-    }, 3000);
-}
-
+// 显示错误消息
 function showError(message) {
-    // 简单的错误提示
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #dc3545;
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        z-index: 10000;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
+    const errorEl = document.createElement('div');
+    errorEl.className = 'notification error';
+    errorEl.textContent = message;
+    document.body.appendChild(errorEl);
     
     setTimeout(() => {
-        document.body.removeChild(toast);
-    }, 3000);
+        errorEl.classList.add('fade-out');
+        setTimeout(() => errorEl.remove(), 300);
+    }, 2000);
+}
+
+// 显示成功消息
+function showSuccess(message) {
+    const successEl = document.createElement('div');
+    successEl.className = 'notification success';
+    successEl.textContent = message;
+    document.body.appendChild(successEl);
+    
+    setTimeout(() => {
+        successEl.classList.add('fade-out');
+        setTimeout(() => successEl.remove(), 300);
+    }, 1500);
 }

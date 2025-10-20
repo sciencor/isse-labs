@@ -12,8 +12,8 @@
             <h1>📝 TodoList 任务管理</h1>
             <div class="stats">
                 <span id="total-count">总计: 0</span>
-                <span id="completed-count">已完成: 0</span>
                 <span id="pending-count">待办: 0</span>
+                <span id="overdue-count">过期: 0</span>
             </div>
         </header>
 
@@ -21,6 +21,7 @@
         <div class="add-todo-form">
             <div class="form-row">
                 <input type="text" id="todo-title" placeholder="输入任务标题..." maxlength="100">
+                <input type="date" id="todo-deadline" class="date-input">
                 <button id="add-btn">添加任务</button>
             </div>
             <div class="form-row">
@@ -32,7 +33,7 @@
                     <option value="medium">中优先级</option>
                     <option value="high">高优先级</option>
                 </select>
-                <input type="text" id="todo-category" placeholder="分类（可选）" maxlength="20">
+                <input type="text" id="todo-category" placeholder="分类（可选，默认：默认分类）" maxlength="20">
             </div>
         </div>
 
@@ -56,9 +57,17 @@
             <div class="filter-group">
                 <label>状态筛选:</label>
                 <select id="filter-status">
-                    <option value="">全部</option>
-                    <option value="pending">待办</option>
-                    <option value="completed">已完成</option>
+                    <option value="">全部待办</option>
+                    <option value="overdue">已过期</option>
+                    <option value="due_today">今天到期</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>排序方式:</label>
+                <select id="sort-by">
+                    <option value="deadline">截止日期</option>
+                    <option value="priority">优先级</option>
+                    <option value="title">标题</option>
                 </select>
             </div>
         </div>
@@ -67,7 +76,19 @@
         <div class="todos-container">
             <ul id="todos-list"></ul>
             <div id="empty-state" class="empty-state" style="display: none;">
-                <p>暂无任务，添加一个新任务开始吧！</p>
+                <p>暂无待办任务，添加一个新任务开始吧！</p>
+            </div>
+
+            <!-- 已完成任务折叠区域 -->
+            <div class="completed-tasks-section">
+                <div class="completed-indicator" id="completed-indicator">
+                    <span>已完成任务</span>
+                    <span class="completed-count-badge" id="completed-count-badge">0</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="completed-tasks-list" id="completed-tasks-list" style="display: none;">
+                    <ul id="completed-todos"></ul>
+                </div>
             </div>
         </div>
     </div>
@@ -86,6 +107,10 @@
                     <input type="text" id="edit-todo-title" maxlength="100">
                 </div>
                 <div class="form-group">
+                    <label>截止日期:</label>
+                    <input type="date" id="edit-todo-deadline" class="date-input">
+                </div>
+                <div class="form-group">
                     <label>描述:</label>
                     <textarea id="edit-todo-description" rows="3"></textarea>
                 </div>
@@ -99,7 +124,7 @@
                 </div>
                 <div class="form-group">
                     <label>分类:</label>
-                    <input type="text" id="edit-todo-category" maxlength="20">
+                    <input type="text" id="edit-todo-category" placeholder="默认：默认分类" maxlength="20">
                 </div>
             </div>
             <div class="modal-footer">
