@@ -1,15 +1,5 @@
 [
   {
-    "id": 2,
-    "title": "机器学习作业",
-    "description": "",
-    "completed": false,
-    "priority": "low",
-    "category": "默认",
-    "created_at": "2025-10-18T19:21:01.124209",
-    "updated_at": "2025-10-18T19:21:01.124209"
-  },
-  {
     "id": 3,
     "title": "智能化软件作业",
     "description": "due下周",
@@ -17,6 +7,18 @@
     "priority": "low",
     "category": "默认",
     "created_at": "2025-10-18T19:21:25.319610",
-    "updated_at": "2025-10-18T19:21:25.319610"
+    "updated_at": "2025-10-18T19:21:25.319610",
+    "status": "pending"
+  },
+  {
+    "id": 2,
+    "title": "机器学习作业",
+    "description": "",
+    "completed": false,
+    "priority": "low",
+    "category": "默认",
+    "created_at": "2025-10-18T19:21:01.124209",
+    "updated_at": "2025-10-18T19:21:01.124209",
+    "status": "pending"
   }
 ]
