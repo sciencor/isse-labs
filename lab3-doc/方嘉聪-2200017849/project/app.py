@@ -120,9 +120,10 @@ initialize_store()
 
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
-    """Returns the list of tasks, optionally filtered by category or priority."""
+    """Returns the list of tasks, supporting optional category, priority, and keyword filters."""
     category = request.args.get("category")
     priority = request.args.get("priority")
+    keyword = request.args.get("search", "").strip().lower()
 
     filtered_tasks = tasks
     if category:
@@ -132,6 +133,10 @@ def get_tasks():
     if priority:
         filtered_tasks = [
             task for task in filtered_tasks if task["priority"] == priority
+        ]
+    if keyword:
+        filtered_tasks = [
+            task for task in filtered_tasks if keyword in task.get("title", "").lower()
         ]
 
     return format_response("success", filtered_tasks, "获取任务列表成功")
@@ -199,6 +204,45 @@ def delete_task(task_id: int):
     tasks = filtered_tasks
     save_tasks_to_file()
     return format_response("success", tasks, "删除任务成功")
+
+
+@app.route("/tasks/batch", methods=["POST"])
+def batch_update_tasks():
+    """Processes batch operations such as deleting tasks or marking them complete."""
+    global tasks
+    payload = request.get_json(silent=True) or {}
+    action = payload.get("action")
+    ids = payload.get("ids")
+
+    if action not in {"delete", "complete"}:
+        return format_response("error", message="不支持的批量操作"), 400
+    if not isinstance(ids, list) or not ids:
+        return format_response("error", message="任务 ID 列表不能为空"), 400
+    try:
+        id_set = {int(task_id) for task_id in ids}
+    except (TypeError, ValueError):
+        return format_response("error", message="任务 ID 无效"), 400
+
+    if action == "delete":
+        new_tasks = [task for task in tasks if task["id"] not in id_set]
+        if len(new_tasks) == len(tasks):
+            return format_response("error", message="未找到选中的任务"), 404
+        tasks = new_tasks
+        save_tasks_to_file()
+        return format_response("success", tasks, "批量删除任务成功")
+
+    completed_state = bool(payload.get("completed", True))
+    updated = 0
+    for task in tasks:
+        if task["id"] in id_set:
+            task["completed"] = completed_state
+            updated += 1
+    if not updated:
+        return format_response("error", message="未找到选中的任务"), 404
+
+    save_tasks_to_file()
+    message = "批量标记完成成功" if completed_state else "批量更新任务成功"
+    return format_response("success", tasks, message)
 
 
 @app.route("/")

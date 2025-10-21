@@ -5,7 +5,7 @@
       "title": "软件设计实践大作业",
       "category": "学习",
       "priority": "高",
-      "completed": false,
+      "completed": true,
       "due_date": "2025-10-21T20:37:00"
     },
     {
@@ -13,7 +13,7 @@
       "title": "摸鱼",
       "category": "生活",
       "priority": "低",
-      "completed": true,
+      "completed": false,
       "due_date": "2025-10-22T20:38:00"
     },
     {
