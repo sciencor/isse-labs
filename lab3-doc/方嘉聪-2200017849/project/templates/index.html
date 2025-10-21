@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>TodoList 任务管理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>任务管理系统</h1>
+            <form id="task-form" class="task-form">
+                <input type="text" id="task-title" placeholder="输入待办事项" required>
+                <select id="task-category" required>
+                    <option value="">选择分类</option>
+                    <option value="学习">学习</option>
+                    <option value="工作">工作</option>
+                    <option value="生活">生活</option>
+                </select>
+                <select id="task-priority" required>
+                    <option value="">选择优先级</option>
+                    <option value="高">高</option>
+                    <option value="中">中</option>
+                    <option value="低">低</option>
+                </select>
+                <button type="submit">添加任务</button>
+            </form>
+        </header>
+
+        <main class="task-list-wrapper">
+            <ul id="task-list" class="task-list"></ul>
+        </main>
+
+        <footer class="filter-panel">
+            <div class="filter-group">
+                <label for="filter-category">按分类筛选：</label>
+                <select id="filter-category">
+                    <option value="">全部</option>
+                    <option value="学习">学习</option>
+                    <option value="工作">工作</option>
+                    <option value="生活">生活</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-priority">按优先级筛选：</label>
+                <select id="filter-priority">
+                    <option value="">全部</option>
+                    <option value="高">高</option>
+                    <option value="中">中</option>
+                    <option value="低">低</option>
+                </select>
+            </div>
+            <button id="reset-filters" type="button">显示全部</button>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

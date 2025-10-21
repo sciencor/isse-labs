@@ -1,7 +1,7 @@
 """Flask backend for a simple TodoList application."""
 
 from typing import Dict, List, Optional
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
 
@@ -102,6 +102,12 @@ def delete_task(task_id: int):
 
     tasks = filtered_tasks
     return format_response("success", tasks, "删除任务成功")
+
+
+@app.route("/")
+def index():
+    """Serves the main frontend page for the TodoList application."""
+    return render_template("index.html")
 
 
 if __name__ == "__main__":
