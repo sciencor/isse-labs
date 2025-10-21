@@ -1,0 +1,36 @@
+API 文档
+
+1. 添加任务
+Endpoint: /add
+请求方法: POST
+参数:
+task (string): 要添加的任务内容
+返回值:
+成功时返回 JSON 格式的任务对象，包括任务的ID和内容
+失败时返回错误信息
+
+2. 删除任务
+Endpoint: /remove/<id>
+请求方法: DELETE
+参数:
+id (int): 要删除的任务的ID
+返回值:
+成功时返回 JSON 格式的删除的任务对象
+如果ID不存在，则返回空
+
+3. 获取所有任务
+Endpoint: /get
+请求方法: GET
+返回值:
+JSON 格式的所有任务的字典形式
+如果没有任务，则返回空字典
+
+4. 更新任务
+Endpoint: /update/<id>
+请求方法: PUT
+参数:
+id (int): 要更新的任务的ID
+task (string): 更新后的任务内容
+返回值:
+成功时返回 JSON 格式的更新后的任务对象
+如果ID不存在，则返回空

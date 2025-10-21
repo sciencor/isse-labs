@@ -1,0 +1,9 @@
+# 忽略环境变量文件
+.env
+
+# 忽略Python虚拟环境
+venv/
+env/
+*.pyc
+__pycache__/
+    

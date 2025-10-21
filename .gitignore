@@ -1,1 +1,6 @@
-**/.DS_Store
+.history
+.isse-venv
+.env
+*.pdf
+API_KEY.env
+.DS_Store   
