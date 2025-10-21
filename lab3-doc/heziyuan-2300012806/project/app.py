@@ -8,8 +8,9 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)
 
-DB_FILE = "todo.db"
-LOG_FILE = "tasks.json"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+DB_FILE = os.path.join(BASE_DIR, "todo.db")
+LOG_FILE = os.path.join(BASE_DIR, "tasks.json")
 
 
 def init_db():
