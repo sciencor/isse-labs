@@ -72,16 +72,28 @@ body {
     border: 1px dashed #dcdde1;
 }
 
+.hidden {
+    display: none !important;
+}
+
 .task-item {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 12px;
     background-color: #ffffff;
     border-radius: 8px;
     padding: 16px;
     border: 1px solid #e0e0e0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.2s ease;
+}
+
+.task-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .task-item:hover {
@@ -109,6 +121,10 @@ body {
     gap: 12px;
     font-size: 14px;
     color: #636e72;
+}
+
+.task-meta .due-date {
+    color: #2d3436;
 }
 
 .task-meta .priority-high {
@@ -141,6 +157,11 @@ body {
 .task-actions .toggle-btn {
     background-color: #00b894;
     color: #fff;
+}
+
+.task-actions .edit-btn {
+    background-color: #fdcb6e;
+    color: #2d3436;
 }
 
 .task-actions .delete-btn {
@@ -185,5 +206,70 @@ body {
 }
 
 #reset-filters:hover {
+    opacity: 0.85;
+}
+
+.sort-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sort-group button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    background-color: #b2bec3;
+    color: #2d3436;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.sort-group button:hover {
+    opacity: 0.85;
+}
+
+.task-edit-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #ecf0f1;
+    margin-top: 12px;
+}
+
+.task-edit-form input,
+.task-edit-form select {
+    padding: 8px 10px;
+    border: 1px solid #dfe6e9;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.task-edit-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.task-edit-actions button {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.task-edit-actions .save-btn {
+    background-color: #0984e3;
+    color: #fff;
+}
+
+.task-edit-actions .cancel-btn {
+    background-color: #b2bec3;
+    color: #2d3436;
+}
+
+.task-edit-actions button:hover {
     opacity: 0.85;
 }

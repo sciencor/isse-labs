@@ -23,6 +23,7 @@
                     <option value="中">中</option>
                     <option value="低">低</option>
                 </select>
+                <input type="datetime-local" id="task-due-date" required>
                 <button type="submit">添加任务</button>
             </form>
         </header>
@@ -51,6 +52,11 @@
                 </select>
             </div>
             <button id="reset-filters" type="button">显示全部</button>
+            <div class="sort-group">
+                <span>按截止时间排序：</span>
+                <button id="sort-asc" type="button">升序</button>
+                <button id="sort-desc" type="button">降序</button>
+            </div>
         </footer>
     </div>
 
