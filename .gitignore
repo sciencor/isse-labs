@@ -3,4 +3,7 @@
 .env
 *.pdf
 API_KEY.env
-.DS_Store   
+.DS_Store 
+
+# ignore __pycache__ folders
+**/__pycache__/
