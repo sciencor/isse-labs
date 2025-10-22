@@ -46,10 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const sort = sortSelect.value;
 		let list = [...tasks];
 
-		// 旗标置顶
-		list.sort((a,b) => (b.flag === true) - (a.flag === true));
-
-		// 排序策略
+		// 先按用户选的排序规则排序（不处理 flag）
 		if (sort === 'name_asc') list.sort((a,b)=> (a.title||'').localeCompare(b.title||''));
 		else if (sort === 'name_desc') list.sort((a,b)=> (b.title||'').localeCompare(a.title||''));
 		else if (sort === 'created_asc') list.sort((a,b)=> new Date(a.created_at||0) - new Date(b.created_at||0));
@@ -61,8 +58,18 @@ document.addEventListener('DOMContentLoaded', () => {
 			list.sort((a,b) => rank(b.priority || '') - rank(a.priority || ''));
 		}
 
+		// 之后：保证未完成在前、已完成在后；并且确保被置顶的任务（flag=true）始终整体置顶。
+		const byCompleted = (a,b) => (a.completed === b.completed) ? 0 : (a.completed ? 1 : -1);
+		// 保持当前排序的相对顺序，稳定地把 flag=true 的放前面
+		const flagged = list.filter(t=> t.flag);
+		const rest = list.filter(t=> !t.flag);
+		// 在每组内保证未完成在前、已完成在后（稳定）
+		flagged.sort(byCompleted);
+		rest.sort(byCompleted);
+		list = [...flagged, ...rest];
+
 		// 未完成在前，已完成在后（稳定）
-		list.sort((a,b)=> (a.completed === b.completed) ? 0 : (a.completed ? 1 : -1));
+		// （已通过上面两步保证）
 
 		tasksContainer.innerHTML = '';
 		if (!list.length) {
@@ -162,65 +169,84 @@ document.addEventListener('DOMContentLoaded', () => {
 		await loadTasks();
 	}
 
-	// 自定义下拉组件（保留原生 select 用于取值）
-	function createCustomSelect(select){
-		const wrapper = document.createElement('div');
-		wrapper.className = 'custom-select';
-		const trigger = document.createElement('button');
-		trigger.type = 'button';
-		trigger.className = 'custom-select__trigger';
-		const label = document.createElement('span');
-		label.className = 'label';
-		label.textContent = select.options[select.selectedIndex]?.text || '';
-		const arrow = document.createElement('span');
-		arrow.className = 'arrow';
-		trigger.appendChild(label);
-		trigger.appendChild(arrow);
+	// 可复用的自定义下拉组件类（实例化后会隐藏原生 select 并创建自定义 UI）
+	class CustomSelect {
+		constructor(select){
+			this.select = select;
+			this._create();
+		}
+		_create(){
+			const select = this.select;
+			const wrapper = document.createElement('div');
+			wrapper.className = 'custom-select';
 
-		const opts = document.createElement('div');
-		opts.className = 'custom-options';
-		Array.from(select.options).forEach(opt => {
-			const o = document.createElement('div');
-			o.className = 'custom-option';
-			o.dataset.value = opt.value;
-			o.textContent = opt.text;
-			if (opt.disabled) o.classList.add('disabled');
-			if (opt.selected) o.classList.add('selected');
-			o.addEventListener('click', ()=>{
-				select.value = opt.value;
-				select.dispatchEvent(new Event('change', { bubbles: true }));
-				label.textContent = opt.text;
-				Array.from(opts.children).forEach(c=>c.classList.toggle('selected', c===o));
-				wrapper.classList.remove('open');
+			const trigger = document.createElement('button');
+			trigger.type = 'button';
+			trigger.className = 'custom-select__trigger';
+			const label = document.createElement('span');
+			label.className = 'label';
+			label.textContent = select.options[select.selectedIndex]?.text || '';
+			const arrow = document.createElement('span');
+			arrow.className = 'arrow';
+			trigger.appendChild(label);
+			trigger.appendChild(arrow);
+
+			const opts = document.createElement('div');
+			opts.className = 'custom-options';
+			Array.from(select.options).forEach(opt => {
+				const o = document.createElement('div');
+				o.className = 'custom-option';
+				o.dataset.value = opt.value;
+				o.textContent = opt.text;
+				if (opt.disabled) o.classList.add('disabled');
+				if (opt.selected) o.classList.add('selected');
+				o.addEventListener('click', ()=>{
+					select.value = opt.value;
+					select.dispatchEvent(new Event('change', { bubbles: true }));
+					label.textContent = opt.text;
+					Array.from(opts.children).forEach(c=>c.classList.toggle('selected', c===o));
+					wrapper.classList.remove('open');
+				});
+				opts.appendChild(o);
 			});
-			opts.appendChild(o);
-		});
 
-		select.parentNode.insertBefore(wrapper, select.nextSibling);
-		wrapper.appendChild(trigger);
-		wrapper.appendChild(opts);
+			select.parentNode.insertBefore(wrapper, select.nextSibling);
+			wrapper.appendChild(trigger);
+			wrapper.appendChild(opts);
 
-		select.classList.add('hidden-select');
+			select.classList.add('hidden-select');
 
-		trigger.addEventListener('click', (e)=>{
-			e.stopPropagation();
-			document.querySelectorAll('.custom-select.open').forEach(cs => { if (cs !== wrapper) cs.classList.remove('open'); });
-			wrapper.classList.toggle('open');
-		});
+			trigger.addEventListener('click', (e)=>{
+				e.stopPropagation();
+				document.querySelectorAll('.custom-select.open').forEach(cs => { if (cs !== wrapper) cs.classList.remove('open'); });
+				wrapper.classList.toggle('open');
+			});
 
-		document.addEventListener('click', (e)=>{ if (!wrapper.contains(e.target)) wrapper.classList.remove('open'); });
+			document.addEventListener('click', (e)=>{ if (!wrapper.contains(e.target)) wrapper.classList.remove('open'); });
 
-		select.addEventListener('change', ()=>{
-			const selOpt = select.options[select.selectedIndex];
-			label.textContent = selOpt ? selOpt.text : '';
-			Array.from(opts.children).forEach(c=> c.classList.toggle('selected', c.dataset.value === select.value));
-		});
+			select.addEventListener('change', ()=>{
+				const selOpt = select.options[select.selectedIndex];
+				label.textContent = selOpt ? selOpt.text : '';
+				Array.from(opts.children).forEach(c=> c.classList.toggle('selected', c.dataset.value === select.value));
+			});
+
+			// 暴露实例属性
+			this.wrapper = wrapper;
+			this.trigger = trigger;
+			this.label = label;
+			this.optionsBox = opts;
+		}
+		// 可选：提供编程设置值的方法
+		setValue(val){
+			this.select.value = val;
+			this.select.dispatchEvent(new Event('change', { bubbles: true }));
+		}
 	}
 
-	// 初始化自定义下拉并绑定控件事件
+	// 初始化自定义下拉组件实例
 	['categorySelect','prioritySelect','sortSelect','filterCategory','filterPriority'].forEach(id=>{
 		const s = document.getElementById(id);
-		if (s) createCustomSelect(s);
+		if (s) new CustomSelect(s);
 	});
 
 	// 绑定排序/筛选/刷新事件
