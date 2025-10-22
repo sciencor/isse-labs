@@ -13,34 +13,27 @@
       <div class="subtitle">简洁、流畅、苹果风格的待办</div>
     </header>
 
-    <form id="addForm" class="add-form" autocomplete="off">
-      <input id="taskInput" type="text" placeholder="输入任务（例如：买牛奶）" required>
-      <select id="prioritySelect" aria-label="优先级">
-        <option value="low">Low</option>
-        <option value="normal" selected>Normal</option>
-        <option value="high">High</option>
-      </select>
-      <input id="categoryInput" type="text" placeholder="分类（可选）" value="默认">
-      <button type="submit" class="btn primary">添加</button>
-    </form>
+    <div class="toolbar">
+      <button id="openCreateBtn" class="btn primary">＋ 新建任务</button>
 
-    <div class="controls">
-      <div class="filter-row">
-        <label class="field">优先级
-          <select id="filterPriority" class="mini">
-            <option value="">全部</option>
-            <option value="low">Low</option>
-            <option value="normal">Normal</option>
-            <option value="high">High</option>
-          </select>
-        </label>
+      <div class="controls">
+        <div class="filter-row">
+          <label class="field">优先级
+            <select id="filterPriority" class="mini">
+              <option value="">全部</option>
+              <option value="low">Low</option>
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+            </select>
+          </label>
 
-        <label class="field">分类
-          <input id="filterCategory" class="mini" placeholder="分类名">
-        </label>
+          <label class="field">分类
+            <input id="filterCategory" class="mini" placeholder="分类名">
+          </label>
 
-        <button id="applyFilter" class="btn">筛选</button>
-        <button id="clearFilter" class="btn ghost">清除</button>
+          <button id="applyFilter" class="btn">筛选</button>
+          <button id="clearFilter" class="btn ghost">清除</button>
+        </div>
       </div>
     </div>
 
@@ -52,6 +45,47 @@
     </div>
 
     <ul id="todoList" class="todo-list"></ul>
+  </div>
+
+  <!-- 新建任务模态框 -->
+  <div id="createModal" class="modal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>新建任务</h3>
+      </div>
+      <form id="createForm" class="modal-body">
+        <label>任务
+          <input id="m_task" name="task" type="text" placeholder="任务内容" required>
+        </label>
+        <label>优先级
+          <select id="m_priority" name="priority">
+            <option value="low">Low</option>
+            <option value="normal" selected>Normal</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+        <label>分类
+          <input id="m_category" name="category" type="text" placeholder="分类（可选）" value="默认">
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" id="createCancel">取消</button>
+          <button type="submit" class="btn primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 自定义确认模态框 -->
+  <div id="confirmModal" class="modal" aria-hidden="true">
+    <div class="modal-dialog small">
+      <div class="modal-body">
+        <div id="confirmText">确认要删除该任务吗？</div>
+        <div class="modal-actions" style="margin-top:12px;">
+          <button id="confirmNo" class="btn ghost">取消</button>
+          <button id="confirmYes" class="btn danger">确认删除</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="/static/script.js"></script>

@@ -1,26 +1,12 @@
 {
   "todos": {
-    "4": {
-      "id": 4,
-      "task": "买牛奶",
-      "completed": false,
-      "priority": "high",
-      "category": "生活"
-    },
-    "5": {
-      "id": 5,
-      "task": "完成作业",
-      "completed": false,
-      "priority": "normal",
-      "category": "学习"
-    },
-    "6": {
-      "id": 6,
-      "task": "买任务",
-      "completed": false,
-      "priority": "normal",
+    "8": {
+      "id": 8,
+      "task": "一般",
+      "completed": true,
+      "priority": "low",
       "category": "默认"
     }
   },
-  "counter": 7
+  "counter": 9
 }

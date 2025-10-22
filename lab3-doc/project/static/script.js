@@ -1,21 +1,46 @@
 const apiBase = '/todos';
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('addForm').addEventListener('submit', onAdd);
+  document.getElementById('openCreateBtn').addEventListener('click', openCreateModal);
   document.getElementById('applyFilter').addEventListener('click', loadTodos);
   document.getElementById('clearFilter').addEventListener('click', clearFilter);
+
+  // modal create handlers
+  document.getElementById('createCancel').addEventListener('click', closeCreateModal);
+  document.getElementById('createForm').addEventListener('submit', onCreateSubmit);
+
+  // confirm modal buttons
+  document.getElementById('confirmNo').addEventListener('click', () => resolveConfirm(false));
+  document.getElementById('confirmYes').addEventListener('click', () => resolveConfirm(true));
+
   loadTodos();
   loadProgress();
 });
 
-async function onAdd(e) {
-  e.preventDefault();
-  const task = document.getElementById('taskInput').value.trim();
-  const priority = document.getElementById('prioritySelect').value;
-  const category = document.getElementById('categoryInput').value.trim() || '默认';
-  if (!task) return showToast('请输入任务内容');
+/* ---------- 新建任务模态 ---------- */
+function openCreateModal() {
+  const m = document.getElementById('createModal');
+  m.setAttribute('aria-hidden', 'false');
+  m.classList.add('open');
+  const input = document.getElementById('m_task');
+  input.focus();
+}
 
-  toggleButtonState(true, '.btn.primary');
+function closeCreateModal() {
+  const m = document.getElementById('createModal');
+  m.setAttribute('aria-hidden', 'true');
+  m.classList.remove('open');
+  // reset form
+  document.getElementById('createForm').reset();
+}
+
+async function onCreateSubmit(e) {
+  e.preventDefault();
+  const task = document.getElementById('m_task').value.trim();
+  const priority = document.getElementById('m_priority').value;
+  const category = document.getElementById('m_category').value.trim() || '默认';
+  if (!task) { showToast('请输入任务内容'); return; }
+
   try {
     const res = await fetch(apiBase, {
       method: 'POST',
@@ -23,7 +48,7 @@ async function onAdd(e) {
       body: JSON.stringify({task, priority, category})
     });
     if (res.ok) {
-      document.getElementById('taskInput').value = '';
+      closeCreateModal();
       loadTodos();
       loadProgress();
       showToast('添加成功');
@@ -32,11 +57,27 @@ async function onAdd(e) {
     }
   } catch (err) {
     showToast('网络错误');
-  } finally {
-    toggleButtonState(false, '.btn.primary');
   }
 }
 
+/* ---------- 自定义确认框（基于 Promise） ---------- */
+let _confirmResolver = null;
+function showConfirm(message) {
+  const cm = document.getElementById('confirmModal');
+  document.getElementById('confirmText').textContent = message || '确认操作？';
+  cm.classList.add('open');
+  cm.setAttribute('aria-hidden', 'false');
+  return new Promise(resolve => { _confirmResolver = resolve; });
+}
+function resolveConfirm(val) {
+  const cm = document.getElementById('confirmModal');
+  cm.classList.remove('open');
+  cm.setAttribute('aria-hidden', 'true');
+  if (_confirmResolver) _confirmResolver(val);
+  _confirmResolver = null;
+}
+
+/* ---------- 业务逻辑（保留原有函数，删除浏览器 confirm 用法） ---------- */
 function getFilters() {
   const priority = document.getElementById('filterPriority').value;
   const category = document.getElementById('filterCategory').value.trim();
@@ -85,9 +126,24 @@ function renderList(items) {
     ul.appendChild(li);
 
     li.querySelector('.chk').addEventListener('change', e => toggleTodo(e.target.dataset.id));
-    li.querySelector('.del').addEventListener('click', () => deleteTodo(item.id));
+    li.querySelector('.del').addEventListener('click', () => confirmAndDelete(item.id));
     li.querySelector('.edit').addEventListener('click', () => editTodoPrompt(item));
   });
+}
+
+async function confirmAndDelete(id) {
+  const ok = await showConfirm('确定要删除该任务吗？此操作不可恢复。');
+  if (!ok) return;
+  try {
+    const res = await fetch(`/todos/${id}`, {method: 'DELETE'});
+    if (res.ok) {
+      loadTodos();
+      loadProgress();
+      showToast('已删除');
+    } else showToast('删除失败');
+  } catch {
+    showToast('网络错误');
+  }
 }
 
 async function toggleTodo(id) {
@@ -97,20 +153,6 @@ async function toggleTodo(id) {
       loadTodos();
       loadProgress();
     } else showToast('切换失败');
-  } catch {
-    showToast('网络错误');
-  }
-}
-
-async function deleteTodo(id) {
-  if (!confirm('确认删除？')) return;
-  try {
-    const res = await fetch(`/todos/${id}`, {method: 'DELETE'});
-    if (res.ok) {
-      loadTodos();
-      loadProgress();
-      showToast('已删除');
-    } else showToast('删除失败');
   } catch {
     showToast('网络错误');
   }
