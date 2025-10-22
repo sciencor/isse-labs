@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo List</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>我的待办事项</h1>
+        
+        <div class="todo-form">
+            <input type="text" id="taskInput" placeholder="输入新任务...">
+            <button onclick="addTodo()">添加</button>
+        </div>
+
+        <div class="todo-list">
+            <h2>待办事项列表</h2>
+            <ul id="todoItems">
+                <!-- 待办事项将在这里动态加载 -->
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
