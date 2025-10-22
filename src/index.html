@@ -48,7 +48,7 @@
                     <option value="created_desc">按创建时间 ↓</option>
                     <option value="due_asc">按结束时间 ↑</option>
                     <option value="due_desc">按结束时间 ↓</option>
-                    <option value="star">星级在前</option>
+                    <option value="priority">按优先级 高→低</option>
                 </select>
             </div>
             <div class="muted" style="margin-left:8px;">（未完成灰色，已完成删除线，星级★，红旗🚩置顶）</div>
@@ -143,7 +143,10 @@ function renderTasks(){
     else if (sort === 'created_desc') list.sort((a,b)=> new Date(b.created_at||0) - new Date(a.created_at||0));
     else if (sort === 'due_asc') list.sort((a,b)=> new Date(a.due_date||0) - new Date(b.due_date||0));
     else if (sort === 'due_desc') list.sort((a,b)=> new Date(b.due_date||0) - new Date(a.due_date||0));
-    else if (sort === 'star') list.sort((a,b)=> (b.star === true) - (a.star === true));
+    else if (sort === 'priority') {
+        const rank = p => (p === 'high') ? 3 : (p === 'medium') ? 2 : (p === 'low') ? 1 : 0;
+        list.sort((a,b) => rank(b.priority || '') - rank(a.priority || ''));
+    }
 
     // 未完成在前，已完成在后（稳定）
     list.sort((a,b)=> (a.completed === b.completed) ? 0 : (a.completed ? 1 : -1));

@@ -8,6 +8,7 @@
     --accent: #6a7880;   /* 按钮等强调色 */
     --danger: #b54b4b;
     --card-shadow: rgba(47,43,40,0.06);
+    --select-bg: #f3f4f6; /* 下拉背景：白天淡灰 */
 }
 
 [data-theme="dark"]{
@@ -19,6 +20,7 @@
     --accent: #8b9a98;
     --danger: #ff6b6b;
     --card-shadow: rgba(0,0,0,0.6);
+    --select-bg: #1b1c1e; /* 下拉背景：夜间深灰 */
 }
 
 /* 确保 html 也使用背景色（修复顶部白线） */
@@ -83,7 +85,7 @@ select {
     min-width:160px;
     min-height:44px;
     line-height:1.2;
-    background-color: var(--card);
+    background-color: var(--select-bg); /* 使用区分背景 */
     color: var(--text);
     cursor: pointer;
     font-family: inherit;
@@ -92,21 +94,16 @@ select {
     box-sizing: border-box;
 }
 
-/* 避免自定义渐变箭头（兼容性问题），移除此前添加的 background-image */
-/* 去掉 IE/Edge 默认箭头但保留视觉上的箭头处理 */
-select::-ms-expand { display: none; }
-select:focus { outline: 2px solid rgba(0,0,0,0.06); }
-
 /* 尽量设置 option 背景/文字颜色（多数浏览器有效） */
 option {
-    background-color: var(--card);
+    background-color: var(--select-bg);
     color: var(--text);
 }
 
 /* 针对深色主题：确保 select 下拉与页面同色并可见（边框、文字） */
 [data-theme="dark"] select,
 [data-theme="dark"] option {
-    background-color: var(--card);
+    background-color: var(--select-bg);
     color: var(--text);
     border:1px solid rgba(255,255,255,0.06);
 }
@@ -132,7 +129,7 @@ option {
     min-width:160px;
     border-radius:10px;
     border:1px solid rgba(47,43,40,0.12);
-    background: var(--card);
+    background: var(--select-bg);
     color: var(--text);
     font-family: inherit;
     font-size:16px;
@@ -174,7 +171,9 @@ option {
     font-weight:600;
     white-space:nowrap;
 }
-.custom-option:hover{ background: rgba(0,0,0,0.04); }
+.custom-option:hover{ 
+    background: rgba(0,0,0,0.04); /* light hover */
+}
 .custom-option.selected{ font-weight:800; }
 
 /* disabled option visual */
@@ -239,7 +238,27 @@ footer{ margin-top:12px; display:flex; gap:8px; align-items:center; justify-cont
     .input-row{ flex-direction:column; align-items:stretch }
 }
 
-/* 小调整：强调按钮与删除按钮颜色 */
+/* 按钮样式：恢复明显的圆角/强调色（使 添加/取消完成/刷新 等按钮正常渲染） */
+button{
+    background: var(--accent);
+    color: #fff;
+    padding:8px 12px;
+    border-radius:6px;
+    border:0;
+    cursor:pointer;
+    font-weight:700;
+    font-size:15px;
+}
+button.ghost{
+    background:transparent;
+    color:var(--accent);
+    border:1px solid rgba(47,43,40,0.06);
+    padding:8px 12px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+/* 删除按钮保持显眼（保留行内样式也会生效） */
 button[style*="background:#ff4d4f"], .danger {
     background: var(--danger) !important;
     color: #fff !important;
