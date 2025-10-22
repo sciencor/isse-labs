@@ -1,11 +1,9 @@
-// ...existing code...
 const apiBase = '/todos';
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('addForm').addEventListener('submit', onAdd);
   document.getElementById('applyFilter').addEventListener('click', loadTodos);
   document.getElementById('clearFilter').addEventListener('click', clearFilter);
-  document.getElementById('resetData').addEventListener('click', resetData);
   loadTodos();
   loadProgress();
 });
@@ -15,18 +13,27 @@ async function onAdd(e) {
   const task = document.getElementById('taskInput').value.trim();
   const priority = document.getElementById('prioritySelect').value;
   const category = document.getElementById('categoryInput').value.trim() || '默认';
-  if (!task) return alert('请输入任务内容');
-  const res = await fetch(apiBase, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({task, priority, category})
-  });
-  if (res.ok) {
-    document.getElementById('taskInput').value = '';
-    loadTodos();
-    loadProgress();
-  } else {
-    alert('添加失败');
+  if (!task) return showToast('请输入任务内容');
+
+  toggleButtonState(true, '.btn.primary');
+  try {
+    const res = await fetch(apiBase, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({task, priority, category})
+    });
+    if (res.ok) {
+      document.getElementById('taskInput').value = '';
+      loadTodos();
+      loadProgress();
+      showToast('添加成功');
+    } else {
+      showToast('添加失败');
+    }
+  } catch (err) {
+    showToast('网络错误');
+  } finally {
+    toggleButtonState(false, '.btn.primary');
   }
 }
 
@@ -41,59 +48,72 @@ function getFilters() {
 
 async function loadTodos() {
   const qs = getFilters();
-  const res = await fetch(`/todos${qs}`);
-  if (!res.ok) return alert('获取列表失败');
-  const items = await res.json();
-  renderList(items);
-  loadProgress();
+  try {
+    const res = await fetch(`/todos${qs}`);
+    if (!res.ok) return showToast('获取列表失败');
+    const items = await res.json();
+    renderList(items);
+    loadProgress();
+  } catch (err) {
+    showToast('网络错误');
+  }
 }
 
 function renderList(items) {
   const ul = document.getElementById('todoList');
   ul.innerHTML = '';
-  if (!items.length) {
+  if (!items || items.length === 0) {
     ul.innerHTML = '<li class="empty">暂无任务</li>';
     return;
   }
   items.forEach(item => {
     const li = document.createElement('li');
-    li.className = item.completed ? 'done' : '';
+    li.className = `todo-item ${item.completed ? 'done' : ''}`;
     li.innerHTML = `
       <div class="left">
-        <input type="checkbox" data-id="${item.id}" ${item.completed ? 'checked' : ''}>
-        <span class="task">${escapeHtml(item.task)}</span>
-        <span class="meta">[${escapeHtml(item.priority)}] <em>${escapeHtml(item.category)}</em></span>
+        <input class="chk" type="checkbox" data-id="${item.id}" ${item.completed ? 'checked' : ''}>
+        <div class="main">
+          <div class="task">${escapeHtml(item.task)}</div>
+          <div class="meta">[${escapeHtml(item.priority)}] · ${escapeHtml(item.category)}</div>
+        </div>
       </div>
       <div class="right">
-        <button class="edit" data-id="${item.id}">编辑</button>
-        <button class="del" data-id="${item.id}">删除</button>
+        <button class="btn mini edit" data-id="${item.id}">编辑</button>
+        <button class="btn mini danger del" data-id="${item.id}">删除</button>
       </div>
     `;
     ul.appendChild(li);
 
-    li.querySelector('input[type=checkbox]').addEventListener('change', e => {
-      toggleTodo(e.target.dataset.id);
-    });
+    li.querySelector('.chk').addEventListener('change', e => toggleTodo(e.target.dataset.id));
     li.querySelector('.del').addEventListener('click', () => deleteTodo(item.id));
     li.querySelector('.edit').addEventListener('click', () => editTodoPrompt(item));
   });
 }
 
 async function toggleTodo(id) {
-  const res = await fetch(`/todos/${id}/toggle`, {method: 'PATCH'});
-  if (res.ok) {
-    loadTodos();
-    loadProgress();
-  } else alert('切换失败');
+  try {
+    const res = await fetch(`/todos/${id}/toggle`, {method: 'PATCH'});
+    if (res.ok) {
+      loadTodos();
+      loadProgress();
+    } else showToast('切换失败');
+  } catch {
+    showToast('网络错误');
+  }
 }
 
 async function deleteTodo(id) {
   if (!confirm('确认删除？')) return;
-  const res = await fetch(`/todos/${id}`, {method: 'DELETE'});
-  if (res.ok) {
-    loadTodos();
-    loadProgress();
-  } else alert('删除失败');
+  try {
+    const res = await fetch(`/todos/${id}`, {method: 'DELETE'});
+    if (res.ok) {
+      loadTodos();
+      loadProgress();
+      showToast('已删除');
+    } else showToast('删除失败');
+  } catch {
+    showToast('网络错误');
+  }
 }
 
 function editTodoPrompt(item) {
@@ -105,25 +125,34 @@ function editTodoPrompt(item) {
 }
 
 async function updateTodo(id, body) {
-  const res = await fetch(`/todos/${id}`, {
-    method: 'PUT',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(body)
-  });
-  if (res.ok) {
-    loadTodos();
-    loadProgress();
-  } else alert('更新失败');
+  try {
+    const res = await fetch(`/todos/${id}`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      loadTodos();
+      loadProgress();
+      showToast('更新成功');
+    } else showToast('更新失败');
+  } catch {
+    showToast('网络错误');
+  }
 }
 
 async function loadProgress() {
-  const res = await fetch('/todos/progress');
-  if (!res.ok) return;
-  const p = await res.json();
-  const fill = document.getElementById('progressFill');
-  const text = document.getElementById('progressText');
-  fill.style.width = `${p.percent}%`;
-  text.textContent = `完成 ${p.completed} / ${p.total} (${p.percent}%)`;
+  try {
+    const res = await fetch('/todos/progress');
+    if (!res.ok) return;
+    const p = await res.json();
+    const fill = document.getElementById('progressFill');
+    const text = document.getElementById('progressText');
+    fill.style.width = `${p.percent}%`;
+    text.textContent = `完成 ${p.completed} / ${p.total} (${p.percent}%)`;
+  } catch {
+    /* ignore */
+  }
 }
 
 function clearFilter() {
@@ -132,17 +161,24 @@ function clearFilter() {
   loadTodos();
 }
 
-// 开发用：重置数据（如果你已在后端开放 reset 或使用 DEV 模式）
-async function resetData() {
-  if (!confirm('确认重置所有任务？')) return;
-  // 如果后端没有 /todos/reset，可直接重置 database.json 文件（见后端说明）
-  const res = await fetch('/todos/reset', {method: 'POST'});
-  if (res.ok) {
-    loadTodos();
-    loadProgress();
-  } else {
-    alert('重置失败（后端未启用 reset 接口）');
+// UI helper: 临时提示（非阻塞）
+function showToast(msg, timeout = 1500) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.className = 'toast';
+    document.body.appendChild(t);
   }
+  t.textContent = msg;
+  t.classList.add('visible');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => t.classList.remove('visible'), timeout);
+}
+
+function toggleButtonState(disabled, selector='.btn') {
+  const btns = document.querySelectorAll(selector);
+  btns.forEach(b => b.disabled = disabled);
 }
 
 // 简单防 XSS

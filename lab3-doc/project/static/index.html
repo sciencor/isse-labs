@@ -2,47 +2,56 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>TodoList</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <div class="container">
-    <h1>TodoList</h1>
+    <header class="topbar">
+      <h1>TodoList</h1>
+      <div class="subtitle">简洁、流畅、苹果风格的待办</div>
+    </header>
 
-    <form id="addForm">
-      <input id="taskInput" type="text" placeholder="任务内容" required>
-      <select id="prioritySelect">
-        <option value="low">low</option>
-        <option value="normal" selected>normal</option>
-        <option value="high">high</option>
+    <form id="addForm" class="add-form" autocomplete="off">
+      <input id="taskInput" type="text" placeholder="输入任务（例如：买牛奶）" required>
+      <select id="prioritySelect" aria-label="优先级">
+        <option value="low">Low</option>
+        <option value="normal" selected>Normal</option>
+        <option value="high">High</option>
       </select>
       <input id="categoryInput" type="text" placeholder="分类（可选）" value="默认">
-      <button type="submit">添加</button>
+      <button type="submit" class="btn primary">添加</button>
     </form>
 
     <div class="controls">
-      <label>优先级筛选：
-        <select id="filterPriority">
-          <option value="">全部</option>
-          <option value="low">low</option>
-          <option value="normal">normal</option>
-          <option value="high">high</option>
-        </select>
-      </label>
-      <label>分类筛选：
-        <input id="filterCategory" placeholder="分类名">
-      </label>
-      <button id="applyFilter">筛选</button>
-      <button id="clearFilter">清除筛选</button>
-      <button id="resetData">（开发）重置数据</button>
+      <div class="filter-row">
+        <label class="field">优先级
+          <select id="filterPriority" class="mini">
+            <option value="">全部</option>
+            <option value="low">Low</option>
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+
+        <label class="field">分类
+          <input id="filterCategory" class="mini" placeholder="分类名">
+        </label>
+
+        <button id="applyFilter" class="btn">筛选</button>
+        <button id="clearFilter" class="btn ghost">清除</button>
+      </div>
     </div>
 
-    <div class="progress-bar">
-      <div id="progressFill"></div>
-      <div id="progressText">完成 0 / 0 (0%)</div>
+    <div class="progress-wrap">
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+      <div id="progressText" class="progress-text">完成 0 / 0 (0%)</div>
     </div>
 
-    <ul id="todoList"></ul>
+    <ul id="todoList" class="todo-list"></ul>
   </div>
 
   <script src="/static/script.js"></script>

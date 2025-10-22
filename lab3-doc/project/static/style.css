@@ -1,17 +1,119 @@
-body{font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial; background:#f5f5f5; color:#222}
-.container{max-width:720px;margin:30px auto;padding:20px;background:#fff;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-h1{margin:0 0 12px}
-form{display:flex;gap:8px;margin-bottom:12px}
-form input, form select{padding:6px;border:1px solid #ddd;border-radius:4px}
-form button{padding:6px 10px}
-.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
-.progress-bar{position:relative;height:18px;background:#eee;border-radius:9px;overflow:hidden;margin-bottom:12px}
-#progressFill{position:absolute;left:0;top:0;height:100%;width:0;background:#4caf50;transition:width .3s}
-#progressText{position:relative;padding:0 8px;font-size:12px;line-height:18px}
-ul#todoList{list-style:none;padding:0;margin:0}
-ul#todoList li{display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #f0f0f0;align-items:center}
-ul#todoList li.done .task{text-decoration:line-through;color:#999}
-.left{display:flex;gap:8px;align-items:center}
-.meta{font-size:12px;color:#666;margin-left:6px}
-.right button{margin-left:6px}
-.empty{text-align:center;color:#888;padding:12px}
+:root{
+  --bg:#f2f5f8;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --primary:#0a84ff; /* iOS 蓝 */
+  --danger:#ff3b30;
+  --glass: rgba(255,255,255,0.6);
+}
+
+*{box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+  background:linear-gradient(180deg,var(--bg), #eef3f7);
+  color:#111;
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+.container{
+  max-width:820px;
+  margin:32px auto;
+  padding:22px;
+  background:var(--card);
+  border-radius:16px;
+  box-shadow: 0 8px 30px rgba(16,24,40,0.08);
+}
+
+.topbar h1{margin:0;font-size:20px;font-weight:600}
+.topbar .subtitle{font-size:13px;color:var(--muted);margin-top:6px}
+
+.add-form{
+  display:flex;
+  gap:10px;
+  margin:16px 0 12px;
+  align-items:center;
+}
+.add-form input[type="text"], .add-form select{
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid #e6e9ef;
+  background: linear-gradient(180deg, rgba(250,250,250,0.9), rgba(245,245,248,0.9));
+  min-width:0;
+  outline:none;
+  transition: box-shadow .12s, transform .08s;
+}
+.add-form input[type="text"]:focus, .add-form select:focus{
+  box-shadow: 0 4px 10px rgba(10,132,255,0.12);
+  transform: translateY(-1px);
+  border-color: rgba(10,132,255,0.28);
+}
+.add-form input[type="text"]{flex:1}
+
+.btn{
+  appearance:none;
+  border:0;
+  padding:9px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  background:transparent;
+  transition: transform .08s, box-shadow .08s, opacity .12s;
+  font-weight:600;
+}
+.btn:hover{transform: translateY(-1px)}
+.btn:active{transform: translateY(0)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+
+.btn.primary{
+  color:white;
+  background: linear-gradient(180deg,var(--primary), #0066d6);
+  box-shadow: 0 6px 18px rgba(10,132,255,0.18);
+}
+
+.btn.ghost{
+  background: rgba(10,132,255,0.06);
+  color: var(--primary);
+  border: 1px solid rgba(10,132,255,0.08);
+}
+
+.btn.mini{
+  padding:6px 8px;
+  border-radius:8px;
+  font-size:13px;
+}
+
+.btn.danger{
+  background: linear-gradient(180deg, #ff6b65, var(--danger));
+  color: white;
+  box-shadow: 0 6px 12px rgba(255,59,48,0.12);
+}
+
+.controls{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.field{display:flex;flex-direction:column;font-size:12px;color:var(--muted)}
+.field .mini{margin-top:6px;padding:8px;border-radius:8px;border:1px solid #eef2f6;background:#fff}
+
+.progress-wrap{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.progress-bar{flex:1;height:12px;background:#eef3f7;border-radius:999px;overflow:hidden;box-shadow: inset 0 1px 0 rgba(255,255,255,0.6)}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--primary), #66b3ff);transition:width .36s ease}
+.progress-text{font-size:13px;color:var(--muted);min-width:160px;text-align:right}
+
+.todo-list{list-style:none;padding:0;margin:0}
+.todo-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;margin-bottom:8px;background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(250,250,252,0.6));box-shadow:0 4px 10px rgba(16,24,40,0.04)}
+.todo-item.done{opacity:.75}
+.left{display:flex;gap:12px;align-items:center}
+.left .chk{width:18px;height:18px;border-radius:6px;border:1px solid #dfe6ef;background:#fff}
+.task{font-size:15px;font-weight:500}
+.meta{font-size:12px;color:var(--muted);margin-top:4px}
+
+.right{display:flex;gap:8px;align-items:center}
+
+.empty{text-align:center;color:var(--muted);padding:18px;border-radius:8px;background:#fafbfd}
+
+/* toast */
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:36px;background:rgba(18,18,18,0.92);color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .18s;
+  z-index:999;
+}
+.toast.visible{opacity:1}

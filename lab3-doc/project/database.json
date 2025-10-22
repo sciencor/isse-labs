@@ -13,7 +13,14 @@
       "completed": false,
       "priority": "normal",
       "category": "学习"
+    },
+    "6": {
+      "id": 6,
+      "task": "买任务",
+      "completed": false,
+      "priority": "normal",
+      "category": "默认"
     }
   },
-  "counter": 6
+  "counter": 7
 }
