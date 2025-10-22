@@ -1,33 +1,19 @@
 {
   "todos": {
-    "1": {
-      "id": 1,
-      "task": "买牛奶",
-      "completed": true,
-      "priority": "high",
-      "category": "生活"
-    },
-    "2": {
-      "id": 2,
-      "task": "买牛奶",
-      "completed": false,
-      "priority": "high",
-      "category": "生活"
-    },
-    "3": {
-      "id": 3,
-      "task": "买牛奶",
-      "completed": false,
-      "priority": "high",
-      "category": "生活"
-    },
     "4": {
       "id": 4,
       "task": "买牛奶",
       "completed": false,
       "priority": "high",
       "category": "生活"
+    },
+    "5": {
+      "id": 5,
+      "task": "完成作业",
+      "completed": false,
+      "priority": "normal",
+      "category": "学习"
     }
   },
-  "counter": 5
+  "counter": 6
 }

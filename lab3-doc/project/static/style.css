@@ -1,0 +1,17 @@
+body{font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial; background:#f5f5f5; color:#222}
+.container{max-width:720px;margin:30px auto;padding:20px;background:#fff;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+h1{margin:0 0 12px}
+form{display:flex;gap:8px;margin-bottom:12px}
+form input, form select{padding:6px;border:1px solid #ddd;border-radius:4px}
+form button{padding:6px 10px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.progress-bar{position:relative;height:18px;background:#eee;border-radius:9px;overflow:hidden;margin-bottom:12px}
+#progressFill{position:absolute;left:0;top:0;height:100%;width:0;background:#4caf50;transition:width .3s}
+#progressText{position:relative;padding:0 8px;font-size:12px;line-height:18px}
+ul#todoList{list-style:none;padding:0;margin:0}
+ul#todoList li{display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #f0f0f0;align-items:center}
+ul#todoList li.done .task{text-decoration:line-through;color:#999}
+.left{display:flex;gap:8px;align-items:center}
+.meta{font-size:12px;color:#666;margin-left:6px}
+.right button{margin-left:6px}
+.empty{text-align:center;color:#888;padding:12px}
