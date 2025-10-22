@@ -1,0 +1,30 @@
+帮我做一个TodoList系统完成以下功能：
+1. 输入待办事项
+2. 所有事项展示在列表中，未完成在前，已完成在后
+3. 未完成实现有三种可选的排列方式：按创建日期前后、按结束日期前后、按重要等级
+4. 用户可以置顶事项，也就是将该事项固定到序列最上方，同时加上旗标
+5. 可删除任务、编辑任务、把任务标记为完成
+6. 可标记重要事项，显示为星
+7. 可将事项分类
+
+这是第一步：后端接口设计
+设计Flask 后端，包含以下路由：
+GET /tasks：获取全部任务；
+POST /tasks：新增任务；
+PUT /tasks/<id>：修改任务状态（完成/未完成）；
+DELETE /tasks/<id>：删除任务；
+EDIT /tasks/<id>：编辑任务；
+GET /tasks?category=xxx：分类
+GET /tasks?flag=true：标记置顶（旗标）
+GET /tasks?star=true：标记星
+每个任务对象字段如下：
+{ "id": 1, "title": "写实验报告", "category": "学习", "flag": true, "star": true, "completed": false }
+暂不使用数据库，用内存列表（或JSON 文件）模拟存储。
+后端返回统一格式：
+{ "status": "success", "data": [...], "message": "新增成功" }
+编写app.py，测试接口在Postman或浏览器中能正常返回。
+
+现在，请给我编写基于Postman的app.py的调试文件，包括测试样例和测试代码。
+测试样例格式是这样的：{ "id": 1, "title": "写实验报告", "category": "学习", "flag": true, "star": true, "completed": false }。
+我对Postman比较生疏，请告诉我具体操作步骤。
+
