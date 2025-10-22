@@ -1,16 +1,20 @@
 const apiBase = '/todos';
+let _currentEditId = null;
+let _confirmResolver = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('openCreateBtn').addEventListener('click', openCreateModal);
   document.getElementById('applyFilter').addEventListener('click', loadTodos);
   document.getElementById('clearFilter').addEventListener('click', clearFilter);
 
-  // modal create handlers
   document.getElementById('createCancel').addEventListener('click', closeCreateModal);
   document.getElementById('createForm').addEventListener('submit', onCreateSubmit);
   document.getElementById('m_category_select').addEventListener('change', onCategorySelectChange);
 
-  // confirm modal buttons
+  document.getElementById('editCancel').addEventListener('click', closeEditModal);
+  document.getElementById('editForm').addEventListener('submit', onEditSubmit);
+  document.getElementById('e_category_select').addEventListener('change', onEditCategorySelectChange);
+
   document.getElementById('confirmNo').addEventListener('click', () => resolveConfirm(false));
   document.getElementById('confirmYes').addEventListener('click', () => resolveConfirm(true));
 
@@ -19,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadProgress();
 });
 
-/* ---------- 类别管理 ---------- */
+/* ---------- categories ---------- */
 async function loadCategories() {
   try {
     const res = await fetch('/categories');
@@ -28,144 +32,176 @@ async function loadCategories() {
     populateCategorySelects(cats);
   } catch {}
 }
-
 function populateCategorySelects(cats) {
   const filterSel = document.getElementById('filterCategory');
   const mSel = document.getElementById('m_category_select');
-  // 清空并添加默认项
+  const eSel = document.getElementById('e_category_select');
   filterSel.innerHTML = '<option value="">全部</option>';
   mSel.innerHTML = '';
-  // 添加选项并在新建 select 最后添加一个 "新建分类" 选项
+  eSel.innerHTML = '';
   cats.forEach(c => {
-    const o1 = document.createElement('option'); o1.value = c; o1.textContent = c; filterSel.appendChild(o1);
-    const o2 = document.createElement('option'); o2.value = c; o2.textContent = c; mSel.appendChild(o2);
+    const oF = document.createElement('option'); oF.value = c; oF.textContent = c; filterSel.appendChild(oF);
+    const oM = document.createElement('option'); oM.value = c; oM.textContent = c; mSel.appendChild(oM);
+    const oE = document.createElement('option'); oE.value = c; oE.textContent = c; eSel.appendChild(oE);
   });
-  const newOpt = document.createElement('option'); newOpt.value = '__new__'; newOpt.textContent = '＋ 新建分类...'; mSel.appendChild(newOpt);
+  const newOptM = document.createElement('option'); newOptM.value = '__new__'; newOptM.textContent = '＋ 新建分类...'; mSel.appendChild(newOptM);
+  const newOptE = document.createElement('option'); newOptE.value = '__new__'; newOptE.textContent = '＋ 新建分类...'; eSel.appendChild(newOptE);
   mSel.value = cats.length ? cats[0] : '';
+  eSel.value = cats.length ? cats[0] : '';
   document.getElementById('m_category_new').style.display = 'none';
+  document.getElementById('e_category_new').style.display = 'none';
 }
+function onCategorySelectChange(e){ document.getElementById('m_category_new').style.display = e.target.value==='__new__' ? '' : 'none'; }
+function onEditCategorySelectChange(e){ document.getElementById('e_category_new').style.display = e.target.value==='__new__' ? '' : 'none'; }
 
-function onCategorySelectChange(e) {
-  const v = e.target.value;
-  const newInput = document.getElementById('m_category_new');
-  if (v === '__new__') {
-    newInput.style.display = '';
-    newInput.focus();
-  } else {
-    newInput.style.display = 'none';
-  }
-}
+/* ---------- create ---------- */
+function openCreateModal(){ const m=document.getElementById('createModal'); m.classList.add('open'); m.setAttribute('aria-hidden','false'); document.getElementById('m_task').focus(); }
+function closeCreateModal(){ const m=document.getElementById('createModal'); m.classList.remove('open'); m.setAttribute('aria-hidden','true'); document.getElementById('createForm').reset(); document.getElementById('m_category_new').style.display='none'; }
 
-/* ---------- 新建任务模态 ---------- */
-function openCreateModal() {
-  const m = document.getElementById('createModal');
-  m.setAttribute('aria-hidden', 'false');
-  m.classList.add('open');
-  document.getElementById('m_task').focus();
-}
-
-function closeCreateModal() {
-  const m = document.getElementById('createModal');
-  m.setAttribute('aria-hidden', 'true');
-  m.classList.remove('open');
-  document.getElementById('createForm').reset();
-  document.getElementById('m_category_new').style.display = 'none';
-}
-
-async function onCreateSubmit(e) {
+async function onCreateSubmit(e){
   e.preventDefault();
   const task = document.getElementById('m_task').value.trim();
   const priority = document.getElementById('m_priority').value;
   const mcatSel = document.getElementById('m_category_select').value;
   const mcatNew = document.getElementById('m_category_new').value.trim();
   const category = (mcatSel === '__new__' ? (mcatNew || '默认') : (mcatSel || '默认'));
-  const dueVal = document.getElementById('m_due').value; // '' or 'YYYY-MM-DD'
+  const dueVal = document.getElementById('m_due').value;
   const due = dueVal || '暂无';
-
-  if (!task) { showToast('请输入任务内容'); return; }
-
-  try {
-    const res = await fetch(apiBase, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({task, priority, category, due})
-    });
-    if (res.ok) {
+  if(!task){ showToast('请输入任务内容'); return; }
+  try{
+    const res = await fetch(apiBase,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task,priority,category,due})});
+    const body = await res.json().catch(()=>null);
+    console.log('POST', res.status, body);
+    if(res.ok){
       closeCreateModal();
-      await loadCategories(); // 若新建分类需要刷新
-      loadTodos();
+      // 清除筛选以便新项可见
+      document.getElementById('filterPriority').value='';
+      document.getElementById('filterCategory').value='';
+      if(document.getElementById('filterCompleted')) document.getElementById('filterCompleted').value='all';
+      if(document.getElementById('sortDue')) document.getElementById('sortDue').value='';
+      await loadCategories();
+      await loadTodos();
       loadProgress();
       showToast('添加成功');
     } else {
       showToast('添加失败');
+      console.error('创建失败：', body);
     }
-  } catch {
-    showToast('网络错误');
+  }catch(err){
+    console.error(err); showToast('网络错误');
   }
 }
 
-/* ---------- 自定义确认框 ---------- */
-let _confirmResolver = null;
-function showConfirm(message) {
-  const cm = document.getElementById('confirmModal');
-  document.getElementById('confirmText').textContent = message || '确认操作？';
-  cm.classList.add('open');
-  cm.setAttribute('aria-hidden', 'false');
-  return new Promise(resolve => { _confirmResolver = resolve; });
+/* ---------- edit ---------- */
+function openEditModal(item){
+  _currentEditId = item.id;
+  const m = document.getElementById('editModal'); m.classList.add('open'); m.setAttribute('aria-hidden','false');
+  document.getElementById('e_task').value = item.task || '';
+  document.getElementById('e_priority').value = item.priority || 'normal';
+  document.getElementById('e_due').value = (item.due && item.due!=='暂无') ? item.due : '';
+  const eSel = document.getElementById('e_category_select');
+  const eNew = document.getElementById('e_category_new');
+  let found=false;
+  for(let i=0;i<eSel.options.length;i++){ if(eSel.options[i].value===item.category){ eSel.value=item.category; found=true; break; } }
+  if(!found){ eSel.value='__new__'; eNew.style.display=''; eNew.value=item.category||''; } else { eNew.style.display='none'; eNew.value=''; }
+  document.getElementById('e_completed').checked = !!item.completed;
+  document.getElementById('e_task').focus();
 }
-function resolveConfirm(val) {
-  const cm = document.getElementById('confirmModal');
-  cm.classList.remove('open');
-  cm.setAttribute('aria-hidden', 'true');
-  if (_confirmResolver) _confirmResolver(val);
-  _confirmResolver = null;
+function closeEditModal(){ const m=document.getElementById('editModal'); m.classList.remove('open'); m.setAttribute('aria-hidden','true'); document.getElementById('editForm').reset(); document.getElementById('e_category_new').style.display='none'; _currentEditId=null; }
+
+async function onEditSubmit(e){
+  e.preventDefault();
+  if(!_currentEditId) return showToast('编辑目标不存在');
+  const task = document.getElementById('e_task').value.trim();
+  const priority = document.getElementById('e_priority').value;
+  const esel = document.getElementById('e_category_select').value;
+  const enew = document.getElementById('e_category_new').value.trim();
+  const category = (esel === '__new__' ? (enew || '默认') : (esel || '默认'));
+  const dueVal = document.getElementById('e_due').value;
+  const due = dueVal || '暂无';
+  const completed = document.getElementById('e_completed').checked;
+  if(!task){ showToast('请输入任务内容'); return; }
+  try{
+    const res = await fetch(`${apiBase}/${_currentEditId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({task,priority,category,due,completed})});
+    const body = await res.json().catch(()=>null);
+    console.log('PUT', res.status, body);
+    if(res.ok){
+      closeEditModal();
+      await loadCategories();
+      await loadTodos();
+      loadProgress();
+      showToast('更新成功');
+    } else { showToast('更新失败'); console.error('更新失败：', body); }
+  }catch(err){ console.error(err); showToast('网络错误'); }
 }
 
-/* ---------- 业务逻辑 ---------- */
-function getFilters() {
+/* ---------- confirm ---------- */
+function showConfirm(message){
+  const cm = document.getElementById('confirmModal');
+  document.getElementById('confirmText').textContent = message || '确认操作？';
+  cm.classList.add('open'); cm.setAttribute('aria-hidden','false');
+  return new Promise(resolve => { _confirmResolver = resolve; });
+}
+function resolveConfirm(val){ const cm=document.getElementById('confirmModal'); cm.classList.remove('open'); cm.setAttribute('aria-hidden','true'); if(_confirmResolver) _confirmResolver(val); _confirmResolver=null; }
+
+/* ---------- due 状态 ---------- */
+function parseDateOnly(dateStr){
+  if(!dateStr || dateStr==='暂无') return null;
+  const d = new Date(dateStr + 'T00:00:00');
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+function getDueStatus(item){
+  if(item.completed) return null;
+  const due = parseDateOnly(item.due);
+  if(!due) return null;
+  const today = new Date(); const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const diffMs = due - todayMid;
+  const oneDay = 24*60*60*1000;
+  if(diffMs < 0) return 'overdue';
+  if(diffMs <= oneDay) return 'near';
+  return null;
+}
+
+/* ---------- load/render ---------- */
+function getFilters(){
   const priority = document.getElementById('filterPriority').value;
   const category = document.getElementById('filterCategory').value;
   const completedSel = document.getElementById('filterCompleted').value;
   const sort = document.getElementById('sortDue').value;
   const params = new URLSearchParams();
-  if (priority) params.append('priority', priority);
-  if (category) params.append('category', category);
-  if (completedSel && completedSel !== 'all') {
-    params.append('completed', completedSel === 'completed' ? 'true' : 'false');
-  }
-  if (sort) params.append('sort', sort);
+  if(priority) params.append('priority', priority);
+  if(category) params.append('category', category);
+  if(completedSel && completedSel !== 'all') params.append('completed', completedSel === 'completed' ? 'true' : 'false');
+  if(sort) params.append('sort', sort);
   return params.toString() ? `?${params.toString()}` : '';
 }
 
-async function loadTodos() {
+async function loadTodos(){
   const qs = getFilters();
-  try {
+  try{
     const res = await fetch(`/todos${qs}`);
-    if (!res.ok) return showToast('获取列表失败');
+    if(!res.ok) return showToast('获取列表失败');
     const items = await res.json();
     renderList(items);
     loadProgress();
-  } catch {
-    showToast('网络错误');
-  }
+  }catch{ showToast('网络错误'); }
 }
 
-function renderList(items) {
-  const ul = document.getElementById('todoList');
-  ul.innerHTML = '';
-  if (!items || items.length === 0) {
-    ul.innerHTML = '<li class="empty">暂无任务</li>';
-    return;
-  }
-  items.forEach(item => {
+function renderList(items){
+  const ul = document.getElementById('todoList'); ul.innerHTML='';
+  if(!items || items.length===0){ ul.innerHTML = '<li class="empty">暂无任务</li>'; return; }
+  items.forEach(item=>{
     const li = document.createElement('li');
     li.className = `todo-item ${item.completed ? 'done' : ''}`;
     const dueDisplay = item.due && item.due !== '暂无' ? item.due : '暂无';
+    const dueStatus = getDueStatus(item);
+    const warnHtml = dueStatus === 'overdue' ? `<span class="warn-icon overdue" title="已过期">⚠</span>` :
+                     dueStatus === 'near' ? `<span class="warn-icon near" title="1 天内到期">⚠</span>` : '';
     li.innerHTML = `
       <div class="left">
         <input class="chk" type="checkbox" data-id="${item.id}" ${item.completed ? 'checked' : ''}>
         <div class="main">
-          <div class="task">${escapeHtml(item.task)}</div>
+          <div class="task">${warnHtml}<span class="task-text">${escapeHtml(item.task)}</span></div>
           <div class="meta">[${escapeHtml(item.priority)}] · ${escapeHtml(item.category)} · 截止：${escapeHtml(dueDisplay)}</div>
         </div>
       </div>
@@ -175,103 +211,26 @@ function renderList(items) {
       </div>
     `;
     ul.appendChild(li);
-
-    li.querySelector('.chk').addEventListener('change', e => toggleTodo(e.target.dataset.id));
-    li.querySelector('.del').addEventListener('click', () => confirmAndDelete(item.id));
-    li.querySelector('.edit').addEventListener('click', () => editTodoPrompt(item));
+    li.querySelector('.chk').addEventListener('change', e=> toggleTodo(e.target.dataset.id));
+    li.querySelector('.del').addEventListener('click', ()=> confirmAndDelete(item.id));
+    li.querySelector('.edit').addEventListener('click', ()=> openEditModal(item));
   });
 }
 
-async function confirmAndDelete(id) {
+async function confirmAndDelete(id){
   const ok = await showConfirm('确定要删除该任务吗？此操作不可恢复。');
-  if (!ok) return;
-  try {
-    const res = await fetch(`/todos/${id}`, {method: 'DELETE'});
-    if (res.ok) {
-      loadTodos();
-      loadProgress();
-      showToast('已删除');
-    } else showToast('删除失败');
-  } catch {
-    showToast('网络错误');
-  }
+  if(!ok) return;
+  try{ const res = await fetch(`/todos/${id}`, {method:'DELETE'}); if(res.ok){ loadTodos(); loadProgress(); showToast('已删除'); } else showToast('删除失败'); } catch { showToast('网络错误'); }
 }
 
-async function toggleTodo(id) {
-  try {
-    const res = await fetch(`/todos/${id}/toggle`, {method: 'PATCH'});
-    if (res.ok) {
-      loadTodos();
-      loadProgress();
-    } else showToast('切换失败');
-  } catch {
-    showToast('网络错误');
-  }
+async function toggleTodo(id){
+  try{ const res = await fetch(`/todos/${id}/toggle`, {method:'PATCH'}); if(res.ok){ loadTodos(); loadProgress(); } else showToast('切换失败'); } catch { showToast('网络错误'); }
 }
 
-function editTodoPrompt(item) {
-  // 简易编辑：使用 prompt，可扩展为模态
-  const newTask = prompt('编辑任务内容：', item.task);
-  if (newTask === null) return;
-  const newPriority = prompt('优先级 (low/normal/high):', item.priority) || item.priority;
-  const newCategory = prompt('分类：', item.category) || item.category;
-  const newDue = prompt('截止日期 (YYYY-MM-DD，留空表示暂无):', item.due && item.due !== '暂无' ? item.due : '') || '暂无';
-  updateTodo(item.id, {task: newTask, priority: newPriority, category: newCategory, due: newDue});
-}
+async function loadProgress(){ try{ const res = await fetch('/todos/progress'); if(!res.ok) return; const p = await res.json(); document.getElementById('progressFill').style.width = `${p.percent}%`; document.getElementById('progressText').textContent = `完成 ${p.completed} / ${p.total} (${p.percent}%)`; } catch{} }
 
-async function updateTodo(id, body) {
-  try {
-    const res = await fetch(`/todos/${id}`, {
-      method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(body)
-    });
-    if (res.ok) {
-      loadCategories(); // 若编辑分类产生新分类
-      loadTodos();
-      loadProgress();
-      showToast('更新成功');
-    } else showToast('更新失败');
-  } catch {
-    showToast('网络错误');
-  }
-}
+function clearFilter(){ document.getElementById('filterPriority').value=''; document.getElementById('filterCategory').value=''; if(document.getElementById('filterCompleted')) document.getElementById('filterCompleted').value='all'; if(document.getElementById('sortDue')) document.getElementById('sortDue').value=''; loadTodos(); }
 
-async function loadProgress() {
-  try {
-    const res = await fetch('/todos/progress');
-    if (!res.ok) return;
-    const p = await res.json();
-    const fill = document.getElementById('progressFill');
-    const text = document.getElementById('progressText');
-    fill.style.width = `${p.percent}%`;
-    text.textContent = `完成 ${p.completed} / ${p.total} (${p.percent}%)`;
-  } catch {
-    /* ignore */
-  }
-}
-
-function clearFilter() {
-  document.getElementById('filterPriority').value = '';
-  document.getElementById('filterCategory').value = '';
-  document.getElementById('filterCompleted').value = 'all';
-  document.getElementById('sortDue').value = '';
-  loadTodos();
-}
-
-// UI helper
-function showToast(msg, timeout = 1500) {
-  let t = document.getElementById('toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'toast';
-    t.className = 'toast';
-    document.body.appendChild(t);
-  }
-  t.textContent = msg;
-  t.classList.add('visible');
-  clearTimeout(t._hideTimer);
-  t._hideTimer = setTimeout(() => t.classList.remove('visible'), timeout);
-}
-
+/* ---------- UI helpers ---------- */
+function showToast(msg, timeout=1500){ let t=document.getElementById('toast'); if(!t){ t=document.createElement('div'); t.id='toast'; t.className='toast'; document.body.appendChild(t); } t.textContent=msg; t.classList.add('visible'); clearTimeout(t._hideTimer); t._hideTimer=setTimeout(()=>t.classList.remove('visible'), timeout); }
 function escapeHtml(s){ return (s+'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }

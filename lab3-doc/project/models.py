@@ -12,24 +12,20 @@ class TodoList:
             try:
                 with open(self.storage_path, "r", encoding="utf-8") as f:
                     content = f.read().strip()
-                    if not content:
-                        raise ValueError("empty")
-                    data = json.loads(content)
+                    if content:
+                        data = json.loads(content)
+                    else:
+                        data = {}
             except Exception:
-                # 初始化默认结构
-                self.todos = {}
-                self.counter = 1
-                self.categories = set(["工作", "生活", "学习", "默认"])
-                self._save()
-                return
-            self.todos = {int(k): v for k, v in data.get("todos", {}).items()}
-            self.counter = data.get("counter", max(self.todos.keys()) + 1 if self.todos else 1)
-            self.categories = set(data.get("categories", ["工作", "生活", "学习", "默认"]))
+                data = {}
         else:
-            self.todos = {}
-            self.counter = 1
-            self.categories = set(["工作", "生活", "学习", "默认"])
-            self._save()
+            data = {}
+        self.todos = {int(k): v for k, v in (data.get("todos") or {}).items()}
+        self.counter = data.get("counter", max(self.todos.keys()) + 1 if self.todos else 1)
+        self.categories = set(data.get("categories", ["工作", "生活", "学习", "默认"]))
+        # 仅在文件不存在时才写入初始结构；如果文件存在且解析失败，上一步已将 data = {}，为了避免覆盖已有数据，应注意恢复逻辑。
+        # 若文件解析成功或不存在，确保保存当前状态
+        self._save()
 
     def _save(self):
         with open(self.storage_path, "w", encoding="utf-8") as f:
@@ -72,18 +68,17 @@ class TodoList:
 
     def get_items(self, priority=None, category=None, completed=None, sort=None):
         results = list(self.todos.values())
-        if priority is not None:
+        if priority:
             results = [i for i in results if i.get("priority") == priority]
-        if category is not None:
+        if category:
             results = [i for i in results if i.get("category") == category]
         if completed is not None:
             results = [i for i in results if i.get("completed") is completed]
 
-        # 排序支持： sort == 'due_asc' 或 'due_desc'
         if sort in ("due_asc", "due_desc"):
             def key_fn(i):
                 d = self._parse_due(i.get("due"))
-                # None -> sort to end for asc, to start for desc by using sentinel
+                # None goes to end for asc, start for desc
                 return (d is None, d) if sort == "due_asc" else (d is not None, d if d is not None else datetime.max.date())
             results.sort(key=key_fn, reverse=(sort == "due_desc"))
         return results

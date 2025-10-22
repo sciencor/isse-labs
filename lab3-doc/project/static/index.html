@@ -65,12 +65,10 @@
     <ul id="todoList" class="todo-list"></ul>
   </div>
 
-  <!-- 新建任务模态框 -->
+  <!-- 新建任务模态 -->
   <div id="createModal" class="modal" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-header">
-        <h3>新建任务</h3>
-      </div>
+      <div class="modal-header"><h3>新建任务</h3></div>
       <form id="createForm" class="modal-body">
         <label>任务
           <input id="m_task" name="task" type="text" placeholder="任务内容" required>
@@ -102,7 +100,47 @@
     </div>
   </div>
 
-  <!-- 自定义确认模态框 -->
+  <!-- 编辑任务模态 -->
+  <div id="editModal" class="modal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header"><h3>编辑任务</h3></div>
+      <form id="editForm" class="modal-body">
+        <label>任务
+          <input id="e_task" name="task" type="text" placeholder="任务内容" required>
+        </label>
+
+        <label>截止日期
+          <input id="e_due" name="due" type="date">
+          <small>留空表示“暂无”</small>
+        </label>
+
+        <label>分类（选择或新建）
+          <select id="e_category_select"></select>
+          <input id="e_category_new" type="text" placeholder="输入新分类名" style="display:none;margin-top:6px">
+        </label>
+
+        <label>优先级
+          <select id="e_priority" name="priority">
+            <option value="low">Low</option>
+            <option value="normal" selected>Normal</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+
+        <label style="display:flex;align-items:center;gap:8px;margin-top:6px">
+          <input id="e_completed" type="checkbox" style="width:16px;height:16px">
+          <span>已完成</span>
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" id="editCancel">取消</button>
+          <button type="submit" class="btn primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 确认模态 -->
   <div id="confirmModal" class="modal" aria-hidden="true">
     <div class="modal-dialog small">
       <div class="modal-body">

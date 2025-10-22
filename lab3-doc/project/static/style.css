@@ -5,6 +5,7 @@
   --primary:#0a84ff; /* iOS 蓝 */
   --danger:#ff3b30;
   --glass: rgba(255,255,255,0.6);
+  --control-height:44px;
 }
 
 *{box-sizing:border-box}
@@ -79,6 +80,30 @@ body{
 
 .right{display:flex;gap:8px;align-items:center}
 
+/* 警示图标 */
+.warn-icon{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;margin-right:8px;font-size:12px;vertical-align:middle;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+.warn-icon.overdue{background: rgba(255,59,48,0.12); color: var(--danger); border:1px solid rgba(255,59,48,0.18)}
+.warn-icon.near{background: rgba(255,199,0,0.12); color:#b36b00; border:1px solid rgba(255,199,0,0.18)}
+.task{display:flex;align-items:center;gap:6px}
+
+/* 统一控件高度（便于对齐） */
+.filter-row .mini, .filter-row .btn, .filter-row select, .filter-row input,
+.btn, .btn.mini, .todo-item .right .btn { height: var(--control-height); min-height:var(--control-height); display:inline-flex; align-items:center; padding:8px 12px; box-sizing:border-box; border-radius:10px; }
+
+/* date 控件样式与文本框一致，内部占位颜色与任务占位保持一致 */
+.modal-body input[type="date"]{
+  width:100%; padding:10px 12px; border-radius:10px; border:1px solid #e6e9ef; background:#fff; outline:none; transition:box-shadow .12s; color:var(--muted); font-weight:400;
+}
+.modal-body input[type="date"]::-webkit-datetime-edit,
+.modal-body input[type="date"]::-webkit-datetime-edit-field,
+.modal-body input[type="date"]::-webkit-datetime-edit-month-field,
+.modal-body input[type="date"]::-webkit-datetime-edit-day-field,
+.modal-body input[type="date"]::-webkit-datetime-edit-year-field{ color:var(--muted); font-weight:400 }
+.modal-body input[type="date"]::-webkit-calendar-picker-indicator{ cursor:pointer; filter:none }
+
+/* 右侧按钮容器垂直居中 */
+.todo-item .right{ display:flex; gap:8px; align-items:center; justify-content:flex-end }
+
 .empty{text-align:center;color:var(--muted);padding:18px;border-radius:8px;background:#fafbfd}
 
 /* modal 共用样式 */
@@ -105,3 +130,34 @@ body{
 /* toast */
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:36px;background:rgba(18,18,18,0.92);color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .18s;z-index:999}
 .toast.visible{opacity:1}
+
+/* 统一表单输入样式：供 text/select/date/new-category 使用 */
+.modal-body .form-input,
+.modal-body input[type="text"],
+.modal-body select {
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid #e6e9ef;
+  background:#fff;
+  outline:none;
+  transition: box-shadow .12s;
+  width:100%;
+  box-sizing:border-box;
+  color: var(--muted);     /* 与占位/说明文字色一致 */
+  font-weight:400;
+}
+
+/* 确保 date 内部字段在 WebKit 中颜色、权重与其它输入一致 */
+.modal-body input[type="date"]::-webkit-datetime-edit,
+.modal-body input[type="date"]::-webkit-datetime-edit-field,
+.modal-body input[type="date"]::-webkit-datetime-edit-month-field,
+.modal-body input[type="date"]::-webkit-datetime-edit-day-field,
+.modal-body input[type="date"]::-webkit-datetime-edit-year-field{
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* 取消对 date 的特殊 max-width（若之前有） */
+.modal-body input[type="date"]{
+  max-width: none;
+}
