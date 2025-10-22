@@ -1,0 +1,124 @@
+/* 全局：莫兰迪风格配色 + 更大更粗的字体 */
+:root{
+    /* Morandi-like muted palette (light) */
+    --bg: #e9e6e3;       /* 背景 */
+    --card: #ffffff;     /* 卡片 */
+    --text: #2f2b28;     /* 主要文字 */
+    --muted: #7d7a78;    /* 次要文字 / muted */
+    --accent: #6a7880;   /* 按钮等强调色 */
+    --danger: #b54b4b;
+    --card-shadow: rgba(47,43,40,0.06);
+}
+
+[data-theme="dark"]{
+    /* Morandi-like dark variant */
+    --bg: #1f2223;
+    --card: #151617;
+    --text: #e6e5e3;
+    --muted: #9a9896;
+    --accent: #7b8a91;
+    --danger: #ff6b6b;
+    --card-shadow: rgba(0,0,0,0.6);
+}
+
+/* 统一字体：使用常见中文无衬线作为首选，确保“年/月/日”等字符与其他文字一致 */
+html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft Yahei", "Noto Sans SC", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px;       /* 更大字体 */
+    font-weight: 600;      /* 更粗 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.45;
+}
+
+/* 容器与布局 */
+.app{ max-width: 980px; margin: 24px auto; padding: 16px; }
+header{ display:flex; gap:12px; align-items:center; margin-bottom:12px; }
+.theme-toggle{ margin-left:auto; }
+
+.card{
+    background: var(--card);
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 8px 22px var(--card-shadow);
+}
+
+/* 表单与控件 */
+.input-row{ display:flex; gap:10px; align-items:center; }
+input[type="text"], select, input[type="datetime-local"]{
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid rgba(47,43,40,0.08);
+    min-width:160px;
+    font-size: 16px;
+    font-weight: 600;
+    background: transparent;
+    color: var(--text);
+}
+button{
+    background: var(--accent);
+    color: #fff;
+    padding:10px 14px;
+    border-radius:8px;
+    border:0;
+    cursor:pointer;
+    font-weight:700;
+}
+button.ghost{
+    background:transparent;
+    color:var(--accent);
+    border:1px solid rgba(47,43,40,0.06);
+}
+
+/* 控件、任务列表 */
+main{ margin-top:12px; display:flex; flex-direction:column; gap:12px; }
+.controls{ display:flex; gap:10px; align-items:center; }
+.tasks{ display:flex; flex-direction:column; gap:10px; }
+.task{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid rgba(47,43,40,0.04);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+}
+.task .meta{ flex:1; display:flex; flex-direction:column; }
+.task .title{ font-weight:800; font-size:20px; color:var(--text); }
+.muted{
+    color:var(--muted);
+    font-size:15px;
+    font-weight:600; /* 与整体一致的粗细，确保年月日字体一致 */
+    font-family: inherit; /* 关键：日期文本也使用同一字体 */
+}
+
+/* 状态与操作按钮 */
+.status{ display:flex; gap:8px; align-items:center; }
+.actions{ display:flex; gap:8px; }
+.star{ color: #c9a84b; font-size:18px; margin-right:6px; }
+.flag{ color: var(--danger); font-size:18px; margin-right:6px; }
+.completed{ color:var(--muted); text-decoration:line-through; opacity:0.85; }
+.unfinished{ color:#6b6f73; background:transparent; }
+
+/* Footer 过滤等 */
+footer{ margin-top:12px; display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.filters{ display:flex; gap:8px; align-items:center; }
+
+/* 响应式 */
+@media (max-width:700px){
+    header{ flex-direction:column; align-items:stretch }
+    .input-row{ flex-direction:column; align-items:stretch }
+}
+
+/* 小调整：强调按钮与删除按钮颜色 */
+button[style*="background:#ff4d4f"], .danger {
+    background: var(--danger) !important;
+    color: #fff !important;
+}
+
+/* 确保时间文本（如 formatDate 输出）不会被浏览器替换成不同字体 */
+time, .muted, .task { font-family: inherit; }
