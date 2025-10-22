@@ -28,7 +28,25 @@
           </label>
 
           <label class="field">分类
-            <input id="filterCategory" class="mini" placeholder="分类名">
+            <select id="filterCategory" class="mini">
+              <option value="">全部</option>
+            </select>
+          </label>
+
+          <label class="field">状态
+            <select id="filterCompleted" class="mini">
+              <option value="all">全部</option>
+              <option value="completed">已完成</option>
+              <option value="not_completed">未完成</option>
+            </select>
+          </label>
+
+          <label class="field">排序（截止）
+            <select id="sortDue" class="mini">
+              <option value="">无</option>
+              <option value="due_asc">截止升序</option>
+              <option value="due_desc">截止降序</option>
+            </select>
           </label>
 
           <button id="applyFilter" class="btn">筛选</button>
@@ -57,6 +75,17 @@
         <label>任务
           <input id="m_task" name="task" type="text" placeholder="任务内容" required>
         </label>
+
+        <label>截止日期
+          <input id="m_due" name="due" type="date">
+          <small>留空表示“暂无”</small>
+        </label>
+
+        <label>分类（选择或新建）
+          <select id="m_category_select"></select>
+          <input id="m_category_new" type="text" placeholder="输入新分类名" style="display:none;margin-top:6px">
+        </label>
+
         <label>优先级
           <select id="m_priority" name="priority">
             <option value="low">Low</option>
@@ -64,9 +93,7 @@
             <option value="high">High</option>
           </select>
         </label>
-        <label>分类
-          <input id="m_category" name="category" type="text" placeholder="分类（可选）" value="默认">
-        </label>
+
         <div class="modal-actions">
           <button type="button" class="btn ghost" id="createCancel">取消</button>
           <button type="submit" class="btn primary">保存</button>

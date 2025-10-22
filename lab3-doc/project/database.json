@@ -1,12 +1,10 @@
 {
-  "todos": {
-    "8": {
-      "id": 8,
-      "task": "一般",
-      "completed": true,
-      "priority": "low",
-      "category": "默认"
-    }
-  },
-  "counter": 9
+  "todos": {},
+  "counter": 9,
+  "categories": [
+    "学习",
+    "工作",
+    "生活",
+    "默认"
+  ]
 }
