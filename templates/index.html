@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>TodoList</title>
+    <style>
+        :root{
+            --bg:#f6f7fb; --card:#fff; --text:#111; --muted:#777; --accent:#2b7cff;
+        }
+        [data-theme="dark"]{
+            --bg:#0f1720; --card:#0b1220; --text:#e6eef8; --muted:#9fb0cf; --accent:#3aa0ff;
+        }
+        html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"PingFang SC","Hiragino Sans GB","Microsoft Yahei",sans-serif;background:var(--bg);color:var(--text);}
+        .app{max-width:980px;margin:24px auto;padding:16px;}
+        header{display:flex;gap:12px;align-items:center;margin-bottom:12px;}
+        .theme-toggle{margin-left:auto;}
+        .card{background:var(--card);border-radius:8px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);}
+        .input-row{display:flex;gap:8px;align-items:center;}
+        input[type="text"], select, input[type="datetime-local"]{padding:8px;border-radius:6px;border:1px solid #ddd;min-width:160px;}
+        button{background:var(--accent);color:#fff;padding:8px 12px;border-radius:6px;border:0;cursor:pointer;}
+        button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(0,0,0,0.06);}
+        main{margin-top:12px;display:flex;flex-direction:column;gap:12px;}
+        .controls{display:flex;gap:8px;align-items:center;}
+        .tasks{display:flex;flex-direction:column;gap:8px;}
+        .task{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.04);}
+        .task .meta{flex:1;display:flex;flex-direction:column;}
+        .task .title{font-weight:600;font-size:16px;}
+        .muted{color:var(--muted);font-size:13px;}
+        .status{display:flex;gap:8px;align-items:center;}
+        .actions{display:flex;gap:6px;}
+        .star{color:gold;font-size:18px;margin-right:6px;}
+        .flag{color:#ff4d4f;font-size:18px;margin-right:6px;}
+        .completed{color:var(--muted);text-decoration:line-through;opacity:0.8;}
+        .unfinished{color:#6b6f73;background:transparent;}
+        footer{margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:space-between;}
+        .filters{display:flex;gap:8px;align-items:center;}
+        @media (max-width:700px){header{flex-direction:column;align-items:stretch}.input-row{flex-direction:column;align-items:stretch}}
+    </style>
+</head>
+<body data-theme="light">
+<div class="app">
+    <header>
+        <h2>TodoList</h2>
+        <div class="theme-toggle">
+            <label>
+                <input id="themeSwitch" type="checkbox"/> 夜间模式
+            </label>
+        </div>
+    </header>
+
+    <section class="card">
+        <div class="input-row">
+            <input id="titleInput" type="text" placeholder="输入待办事项标题" />
+            <select id="categorySelect">
+                <option value="">分类: 无</option>
+                <option>学习</option>
+                <option>工作</option>
+                <option>生活</option>
+            </select>
+            <select id="prioritySelect">
+                <option value="">优先级: 无</option>
+                <option value="low">低</option>
+                <option value="medium">中</option>
+                <option value="high">高</option>
+            </select>
+            <input id="dueInput" type="datetime-local" />
+            <button id="addBtn">添加任务</button>
+            <button id="clearBtn" class="ghost">清空输入</button>
+        </div>
+
+        <div style="margin-top:10px;" class="controls">
+            <div>
+                排序:
+                <select id="sortSelect">
+                    <option value="flag">旗标优先</option>
+                    <option value="name_asc">按字典名称 ↑</option>
+                    <option value="name_desc">按字典名称 ↓</option>
+                    <option value="created_asc">按创建时间 ↑</option>
+                    <option value="created_desc">按创建时间 ↓</option>
+                    <option value="due_asc">按结束时间 ↑</option>
+                    <option value="due_desc">按结束时间 ↓</option>
+                    <option value="star">星级在前</option>
+                </select>
+            </div>
+            <div class="muted" style="margin-left:8px;">（未完成灰色，已完成删除线，星级★，红旗🚩置顶）</div>
+        </div>
+    </section>
+
+    <main>
+        <section class="card">
+            <div class="tasks" id="tasksContainer">
+                <!-- 任务项由JS渲染 -->
+            </div>
+        </section>
+
+        <footer class="card">
+            <div class="filters">
+                筛选:
+                <select id="filterCategory">
+                    <option value="">全部分类</option>
+                    <option>学习</option>
+                    <option>工作</option>
+                    <option>生活</option>
+                </select>
+                <select id="filterPriority">
+                    <option value="">全部优先级</option>
+                    <option value="high">高</option>
+                    <option value="medium">中</option>
+                    <option value="low">低</option>
+                </select>
+            </div>
+            <div>
+                <button id="refreshBtn" class="ghost">刷新</button>
+            </div>
+        </footer>
+    </main>
+</div>
+
+<script>
+const API_BASE = 'http://127.0.0.1:5000';
+const tasksContainer = document.getElementById('tasksContainer');
+const titleInput = document.getElementById('titleInput');
+const categorySelect = document.getElementById('categorySelect');
+const prioritySelect = document.getElementById('prioritySelect');
+const dueInput = document.getElementById('dueInput');
+const addBtn = document.getElementById('addBtn');
+const sortSelect = document.getElementById('sortSelect');
+const filterCategory = document.getElementById('filterCategory');
+const filterPriority = document.getElementById('filterPriority');
+const refreshBtn = document.getElementById('refreshBtn');
+const clearBtn = document.getElementById('clearBtn');
+const themeSwitch = document.getElementById('themeSwitch');
+
+let tasks = [];
+
+// 主题切换
+themeSwitch.addEventListener('change', () => {
+    document.body.setAttribute('data-theme', themeSwitch.checked ? 'dark' : 'light');
+});
+
+// 载入任务
+async function loadTasks(){
+    const params = new URLSearchParams();
+    const cat = filterCategory.value;
+    const pr = filterPriority.value;
+    if (cat) params.append('category', cat);
+    if (pr) {
+        // 后端没有 priority 查询，客户端做过滤
+    }
+    try{
+        const res = await fetch(`${API_BASE}/tasks`);
+        const json = await res.json();
+        tasks = json.data || [];
+        // 客户端再按筛选优先级过滤
+        if (pr) tasks = tasks.filter(t => (t.priority || '') === pr);
+        renderTasks();
+    }catch(e){
+        tasksContainer.innerHTML = '<div class="muted">无法连接后端，请确保 Flask 在运行并允许跨域 (CORS)</div>';
+    }
+}
+
+// 渲染任务列表
+function renderTasks(){
+    const sort = sortSelect.value;
+    let list = [...tasks];
+
+    // 旗标置顶
+    list.sort((a,b) => (b.flag === true) - (a.flag === true));
+
+    // 排序策略
+    if (sort === 'name_asc') list.sort((a,b)=> (a.title||'').localeCompare(b.title||''));
+    else if (sort === 'name_desc') list.sort((a,b)=> (b.title||'').localeCompare(a.title||''));
+    else if (sort === 'created_asc') list.sort((a,b)=> new Date(a.created_at||0) - new Date(b.created_at||0));
+    else if (sort === 'created_desc') list.sort((a,b)=> new Date(b.created_at||0) - new Date(a.created_at||0));
+    else if (sort === 'due_asc') list.sort((a,b)=> new Date(a.due_date||0) - new Date(b.due_date||0));
+    else if (sort === 'due_desc') list.sort((a,b)=> new Date(b.due_date||0) - new Date(a.due_date||0));
+    else if (sort === 'star') list.sort((a,b)=> (b.star === true) - (a.star === true));
+
+    // 未完成在前，已完成在后（稳定）
+    list.sort((a,b)=> (a.completed === b.completed) ? 0 : (a.completed ? 1 : -1));
+
+    tasksContainer.innerHTML = '';
+    if (!list.length) {
+        tasksContainer.innerHTML = '<div class="muted">未找到任务</div>';
+        return;
+    }
+
+    for (const t of list){
+        const div = document.createElement('div');
+        div.className = 'task card';
+        const titleClass = t.completed ? 'title completed' : 'title';
+        div.innerHTML = `
+            <div style="display:flex;align-items:center;gap:8px;">
+                ${t.flag ? '<span class="flag">🚩</span>' : ''}
+                ${t.star ? '<span class="star">★</span>' : ''}
+            </div>
+            <div class="meta">
+                <div class="${titleClass}">${escapeHtml(t.title || '(无标题)')}</div>
+                <div class="muted">${escapeHtml(t.category || '无分类')} · 优先:${escapeHtml(t.priority || '无')} · 创建:${formatDate(t.created_at)} ${t.due_date ? '· 到期:' + formatDate(t.due_date) : ''}</div>
+            </div>
+            <div class="status">
+                <div class="muted">${t.completed ? '已完成' : '未完成'}</div>
+                <div class="actions">
+                    <button data-id="${t.id}" class="toggleBtn">${t.completed ? '取消完成' : '标为完成'}</button>
+                    <button data-id="${t.id}" class="starBtn">${t.star ? '取消星' : '标星'}</button>
+                    <button data-id="${t.id}" class="flagBtn">${t.flag ? '取消置顶' : '置顶'}</button>
+                    <button data-id="${t.id}" class="editBtn">编辑</button>
+                    <button data-id="${t.id}" class="delBtn" style="background:#ff4d4f">删除</button>
+                </div>
+            </div>
+        `;
+        // 视觉样式：未完成为灰色文本（title not bold white); completed strike applied via class
+        if (!t.completed) div.style.opacity = 0.92;
+
+        // 绑定事件
+        div.querySelector('.toggleBtn').addEventListener('click', ()=> toggleComplete(t.id));
+        div.querySelector('.starBtn').addEventListener('click', ()=> toggleField(t.id, 'star', !t.star));
+        div.querySelector('.flagBtn').addEventListener('click', ()=> toggleField(t.id, 'flag', !t.flag));
+        div.querySelector('.editBtn').addEventListener('click', ()=> editTaskDialog(t));
+        div.querySelector('.delBtn').addEventListener('click', ()=> deleteTask(t.id));
+        tasksContainer.appendChild(div);
+    }
+}
+
+// 安全的文本转义
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+function formatDate(d){ if(!d) return ''; try{ const dt=new Date(d); if(isNaN(dt)) return d; return dt.toLocaleString(); }catch(e){return d;} }
+
+// 添加任务
+addBtn.addEventListener('click', async ()=>{
+    const title = titleInput.value.trim();
+    if (!title){ alert('请填写标题'); return; }
+    const payload = {
+        title,
+        category: categorySelect.value || '',
+        priority: prioritySelect.value || '',
+        due_date: dueInput.value ? new Date(dueInput.value).toISOString() : null,
+        flag: false,
+        star: false
+    };
+    try{
+        const res = await fetch(`${API_BASE}/tasks`, {
+            method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
+        });
+        const json = await res.json();
+        await loadTasks();
+        clearInputs();
+    }catch(e){
+        alert('请求失败，请检查后端是否启动');
+    }
+});
+
+function clearInputs(){ titleInput.value=''; categorySelect.value=''; prioritySelect.value=''; dueInput.value=''; }
+
+// 切换完成(后端 PUT 切换)
+async function toggleComplete(id){
+    await fetch(`${API_BASE}/tasks/${id}`, { method: 'PUT' });
+    await loadTasks();
+}
+
+// 切换字段 (PATCH)
+async function toggleField(id, field, value){
+    await fetch(`${API_BASE}/tasks/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({[field]: value}) });
+    await loadTasks();
+}
+
+// 删除
+async function deleteTask(id){
+    if (!confirm('确认删除？')) return;
+    await fetch(`${API_BASE}/tasks/${id}`, { method:'DELETE' });
+    await loadTasks();
+}
+
+// 编辑对话（简化，使用 prompt）
+async function editTaskDialog(task){
+    const newTitle = prompt('标题', task.title || '');
+    if (newTitle === null) return;
+    const newCategory = prompt('分类', task.category || '') ?? '';
+    const newPriority = prompt('优先级 (low/medium/high)', task.priority || '') ?? '';
+    const newDue = prompt('到期（ISO 或 空）', task.due_date || '') ?? '';
+    const update = { title: newTitle, category: newCategory, priority: newPriority, due_date: newDue || null };
+    await fetch(`${API_BASE}/tasks/${task.id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(update) });
+    await loadTasks();
+}
+
+sortSelect.addEventListener('change', renderTasks);
+filterCategory.addEventListener('change', loadTasks);
+filterPriority.addEventListener('change', loadTasks);
+refreshBtn.addEventListener('click', loadTasks);
+clearBtn.addEventListener('click', clearInputs);
+
+// 初始加载
+loadTasks();
+</script>
+</body>
+</html>
