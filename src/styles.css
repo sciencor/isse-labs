@@ -11,14 +11,19 @@
 }
 
 [data-theme="dark"]{
-    /* Morandi-like dark variant */
-    --bg: #1f2223;
-    --card: #151617;
-    --text: #e6e5e3;
-    --muted: #9a9896;
-    --accent: #7b8a91;
+    /* Morandi-like dark variant (调整为暖黄文本以满足需求) */
+    --bg: #0f1111;            /* 更深的背景，避免白线透出 */
+    --card: #121314;
+    --text: #ffd84a;         /* 正黄色（温和且清晰） */
+    --muted: #d6caa0;        /* 次要文字偏暖色，保持可读 */
+    --accent: #8b9a98;
     --danger: #ff6b6b;
     --card-shadow: rgba(0,0,0,0.6);
+}
+
+/* 确保 html 也使用背景色（修复顶部白线） */
+html {
+    background: var(--bg);
 }
 
 /* 统一字体：使用常见中文无衬线作为首选，确保“年/月/日”等字符与其他文字一致 */
@@ -58,6 +63,8 @@ input[type="text"], select, input[type="datetime-local"]{
     font-weight: 600;
     background: transparent;
     color: var(--text);
+    font-family: inherit;      /* 确保输入使用相同字体 */
+    -webkit-font-smoothing: antialiased;
 }
 button{
     background: var(--accent);
@@ -120,5 +127,26 @@ button[style*="background:#ff4d4f"], .danger {
     color: #fff !important;
 }
 
-/* 确保时间文本（如 formatDate 输出）不会被浏览器替换成不同字体 */
+/* 确保 time / mut ed 文本都继承字体 */
 time, .muted, .task { font-family: inherit; }
+
+/* 强制 datetime-local 内部编辑区域使用相同字体（修复仅日期为宋体的问题，针对 WebKit） */
+input[type="datetime-local"]::-webkit-datetime-edit,
+input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper,
+input[type="datetime-local"]::-webkit-datetime-edit-year-field,
+input[type="datetime-local"]::-webkit-datetime-edit-month-field,
+input[type="datetime-local"]::-webkit-datetime-edit-day-field,
+input[type="datetime-local"]::-webkit-datetime-edit-hour-field,
+input[type="datetime-local"]::-webkit-datetime-edit-minute-field {
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    color: inherit;
+}
+
+/* Firefox (部分版本) 的替代：使用通用选择器确保字体继承 */
+input[type="datetime-local"] * {
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    color: inherit !important;
+}
