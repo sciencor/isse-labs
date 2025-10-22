@@ -49,7 +49,7 @@ h3 {
 
 .task-form {
   display: grid;
-  grid-template-columns: 1.5fr repeat(2, 1fr) auto;
+  grid-template-columns: 1.5fr repeat(3, 1fr) auto;
   gap: 12px;
   align-items: center;
 }
@@ -148,7 +148,7 @@ h3 {
 .task-meta {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .task-title {
@@ -170,6 +170,11 @@ h3 {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.4px;
+}
+
+.task-due-date {
+  font-size: 13px;
+  color: #5a6176;
 }
 
 .badge-category {
@@ -226,7 +231,19 @@ h3 {
 .filter-panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
+}
+
+.filter-search {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-search input {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #cfd3dc;
 }
 
 .filter-controls {

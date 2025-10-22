@@ -5,11 +5,14 @@ const taskForm = document.getElementById("taskForm");
 const titleInput = document.getElementById("taskTitle");
 const categorySelect = document.getElementById("taskCategory");
 const prioritySelect = document.getElementById("taskPriority");
+const dueDateInput = document.getElementById("taskDueDate");
 const statusMessage = document.getElementById("statusMessage");
 const emptyHint = document.getElementById("emptyHint");
 
 const filterCategorySelect = document.getElementById("filterCategory");
 const filterPrioritySelect = document.getElementById("filterPriority");
+const sortSelect = document.getElementById("sortOption");
+const searchInput = document.getElementById("searchKeyword");
 const applyFilterButton = document.getElementById("applyFilterButton");
 const clearFilterButton = document.getElementById("clearFilterButton");
 const refreshButton = document.getElementById("refreshButton");
@@ -17,6 +20,8 @@ const refreshButton = document.getElementById("refreshButton");
 const currentFilters = {
   category: "",
   priority: "",
+  search: "",
+  sort: "",
 };
 
 function showMessage(text, type = "info") {
@@ -54,6 +59,12 @@ function renderTasks(tasks) {
     title.classList.add("task-title");
     title.textContent = task.title;
 
+    const dueDate = document.createElement("span");
+    dueDate.classList.add("task-due-date");
+    dueDate.textContent = task.dueDate
+      ? `截止日期：${task.dueDate}`
+      : "截止日期：未设置";
+
     const labels = document.createElement("div");
     labels.classList.add("task-labels");
 
@@ -69,7 +80,7 @@ function renderTasks(tasks) {
     priorityBadge.textContent = `优先级：${task.priority}`;
 
     labels.append(categoryBadge, priorityBadge);
-    meta.append(title, labels);
+    meta.append(title, dueDate, labels);
 
     const actions = document.createElement("div");
     actions.classList.add("task-actions");
@@ -103,6 +114,12 @@ async function loadTasks() {
   if (currentFilters.priority) {
     params.set("priority", currentFilters.priority);
   }
+  if (currentFilters.search) {
+    params.set("search", currentFilters.search);
+  }
+  if (currentFilters.sort) {
+    params.set("sort", currentFilters.sort);
+  }
 
   const url = params.toString() ? `${API_BASE}?${params}` : API_BASE;
 
@@ -114,8 +131,9 @@ async function loadTasks() {
       throw new Error(body.message || "加载任务失败");
     }
 
-    renderTasks(body.data || []);
-    showMessage(`已加载 ${body.data.length} 条任务`);
+    const tasks = Array.isArray(body.data) ? body.data : [];
+    renderTasks(tasks);
+    showMessage(`已加载 ${tasks.length} 条任务`);
   } catch (error) {
     renderTasks([]);
     showMessage(error.message, "error");
@@ -128,8 +146,9 @@ async function addTask(event) {
   const title = titleInput.value.trim();
   const category = categorySelect.value;
   const priority = prioritySelect.value;
+  const dueDate = dueDateInput.value;
 
-  if (!title || !category || !priority) {
+  if (!title || !category || !priority || !dueDate) {
     showMessage("请填写完整的任务信息", "error");
     return;
   }
@@ -138,7 +157,7 @@ async function addTask(event) {
     const response = await fetch(API_BASE, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, category, priority }),
+      body: JSON.stringify({ title, category, priority, dueDate }),
     });
     const body = await response.json();
 
@@ -196,14 +215,20 @@ async function toggleTask(id, completed) {
 function filterTasks() {
   currentFilters.category = filterCategorySelect.value;
   currentFilters.priority = filterPrioritySelect.value;
+  currentFilters.search = searchInput.value.trim();
+  currentFilters.sort = sortSelect.value;
   loadTasks();
 }
 
 function clearFilters() {
   currentFilters.category = "";
   currentFilters.priority = "";
+  currentFilters.search = "";
+  currentFilters.sort = "";
   filterCategorySelect.value = "";
   filterPrioritySelect.value = "";
+  searchInput.value = "";
+  sortSelect.value = "";
   loadTasks();
 }
 
@@ -212,11 +237,15 @@ document.addEventListener("DOMContentLoaded", () => {
   applyFilterButton.addEventListener("click", filterTasks);
   clearFilterButton.addEventListener("click", clearFilters);
   refreshButton.addEventListener("click", () => loadTasks());
+  searchInput.addEventListener("keyup", (event) => {
+    if (event.key === "Enter") {
+      filterTasks();
+    }
+  });
 
   loadTasks();
 });
 
-// 暴露函数供调试使用（可在控制台触发）
 window.loadTasks = loadTasks;
 window.addTask = addTask;
 window.deleteTask = deleteTask;
