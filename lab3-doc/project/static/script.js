@@ -4,19 +4,13 @@ let _confirmResolver = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('openCreateBtn').addEventListener('click', openCreateModal);
-  document.getElementById('applyFilter').addEventListener('click', loadTodos);
   document.getElementById('clearFilter').addEventListener('click', clearFilter);
 
-  document.getElementById('createCancel').addEventListener('click', closeCreateModal);
-  document.getElementById('createForm').addEventListener('submit', onCreateSubmit);
-  document.getElementById('m_category_select').addEventListener('change', onCategorySelectChange);
-
-  document.getElementById('editCancel').addEventListener('click', closeEditModal);
-  document.getElementById('editForm').addEventListener('submit', onEditSubmit);
-  document.getElementById('e_category_select').addEventListener('change', onEditCategorySelectChange);
-
-  document.getElementById('confirmNo').addEventListener('click', () => resolveConfirm(false));
-  document.getElementById('confirmYes').addEventListener('click', () => resolveConfirm(true));
+  // 移除“筛选”按钮，并确保筛选控件实时更新
+  document.getElementById('filterPriority').addEventListener('change', loadTodos);
+  document.getElementById('filterCategory').addEventListener('change', loadTodos);
+  document.getElementById('filterCompleted').addEventListener('change', loadTodos);
+  document.getElementById('sortDue').addEventListener('change', loadTodos);
 
   loadCategories();
   loadTodos();
@@ -56,7 +50,13 @@ function onEditCategorySelectChange(e){ document.getElementById('e_category_new'
 
 /* ---------- create ---------- */
 function openCreateModal(){ const m=document.getElementById('createModal'); m.classList.add('open'); m.setAttribute('aria-hidden','false'); document.getElementById('m_task').focus(); }
-function closeCreateModal(){ const m=document.getElementById('createModal'); m.classList.remove('open'); m.setAttribute('aria-hidden','true'); document.getElementById('createForm').reset(); document.getElementById('m_category_new').style.display='none'; }
+function closeCreateModal() {
+  const m = document.getElementById('createModal');
+  m.classList.remove('open');
+  m.setAttribute('aria-hidden', 'true');
+  document.getElementById('createForm').reset(); // 重置表单
+  document.getElementById('m_category_new').style.display = 'none'; // 隐藏新分类输入框
+}
 
 async function onCreateSubmit(e){
   e.preventDefault();
@@ -65,20 +65,29 @@ async function onCreateSubmit(e){
   const mcatSel = document.getElementById('m_category_select').value;
   const mcatNew = document.getElementById('m_category_new').value.trim();
   const category = (mcatSel === '__new__' ? (mcatNew || '默认') : (mcatSel || '默认'));
-  const dueVal = document.getElementById('m_due').value;
-  const due = dueVal || '暂无';
-  if(!task){ showToast('请输入任务内容'); return; }
-  try{
-    const res = await fetch(apiBase,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task,priority,category,due})});
-    const body = await res.json().catch(()=>null);
+  const dueVal = document.getElementById('m_due').value; // '' or 'YYYY-MM-DD'
+  const due = dueVal || '暂无'; // 如果未填写日期，则设置为“暂无”
+
+  if (!task) {
+    showToast('请输入任务内容');
+    return;
+  }
+
+  try {
+    const res = await fetch(apiBase, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ task, priority, category, due })
+    });
+    const body = await res.json().catch(() => null);
     console.log('POST', res.status, body);
-    if(res.ok){
+    if (res.ok) {
       closeCreateModal();
       // 清除筛选以便新项可见
-      document.getElementById('filterPriority').value='';
-      document.getElementById('filterCategory').value='';
-      if(document.getElementById('filterCompleted')) document.getElementById('filterCompleted').value='all';
-      if(document.getElementById('sortDue')) document.getElementById('sortDue').value='';
+      document.getElementById('filterPriority').value = '';
+      document.getElementById('filterCategory').value = '';
+      if (document.getElementById('filterCompleted')) document.getElementById('filterCompleted').value = 'all';
+      if (document.getElementById('sortDue')) document.getElementById('sortDue').value = '';
       await loadCategories();
       await loadTodos();
       loadProgress();
@@ -87,8 +96,9 @@ async function onCreateSubmit(e){
       showToast('添加失败');
       console.error('创建失败：', body);
     }
-  }catch(err){
-    console.error(err); showToast('网络错误');
+  } catch (err) {
+    console.error(err);
+    showToast('网络错误');
   }
 }
 
@@ -142,7 +152,15 @@ function showConfirm(message){
   cm.classList.add('open'); cm.setAttribute('aria-hidden','false');
   return new Promise(resolve => { _confirmResolver = resolve; });
 }
-function resolveConfirm(val){ const cm=document.getElementById('confirmModal'); cm.classList.remove('open'); cm.setAttribute('aria-hidden','true'); if(_confirmResolver) _confirmResolver(val); _confirmResolver=null; }
+function resolveConfirm(val) {
+  const cm = document.getElementById('confirmModal');
+  cm.classList.remove('open');
+  cm.setAttribute('aria-hidden', 'true');
+  if (_confirmResolver) {
+    _confirmResolver(val); // 正确调用 resolver
+  }
+  _confirmResolver = null;
+}
 
 /* ---------- due 状态 ---------- */
 function parseDateOnly(dateStr){
@@ -217,19 +235,98 @@ function renderList(items){
   });
 }
 
-async function confirmAndDelete(id){
+// 修复 resolveConfirm 函数，确保点击“确认删除”或“取消”时触发逻辑
+function resolveConfirm(val) {
+  const cm = document.getElementById('confirmModal');
+  cm.classList.remove('open');
+  cm.setAttribute('aria-hidden', 'true');
+  if (_confirmResolver) {
+    _confirmResolver(val); // 正确调用 resolver
+  }
+  _confirmResolver = null;
+}
+
+// 修复 confirmAndDelete 函数，确保删除逻辑正确执行
+async function confirmAndDelete(id) {
   const ok = await showConfirm('确定要删除该任务吗？此操作不可恢复。');
-  if(!ok) return;
-  try{ const res = await fetch(`/todos/${id}`, {method:'DELETE'}); if(res.ok){ loadTodos(); loadProgress(); showToast('已删除'); } else showToast('删除失败'); } catch { showToast('网络错误'); }
+  if (!ok) return; // 用户取消删除
+  try {
+    const res = await fetch(`/todos/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      loadTodos();
+      loadProgress();
+      showToast('已删除');
+    } else {
+      showToast('删除失败');
+    }
+  } catch {
+    showToast('网络错误');
+  }
 }
 
-async function toggleTodo(id){
-  try{ const res = await fetch(`/todos/${id}/toggle`, {method:'PATCH'}); if(res.ok){ loadTodos(); loadProgress(); } else showToast('切换失败'); } catch { showToast('网络错误'); }
+// 修复 closeCreateModal 函数，确保模态框正确关闭
+function closeCreateModal() {
+  const m = document.getElementById('createModal');
+  m.classList.remove('open');
+  m.setAttribute('aria-hidden', 'true');
+  document.getElementById('createForm').reset(); // 重置表单
+  document.getElementById('m_category_new').style.display = 'none'; // 隐藏新分类输入框
 }
 
-async function loadProgress(){ try{ const res = await fetch('/todos/progress'); if(!res.ok) return; const p = await res.json(); document.getElementById('progressFill').style.width = `${p.percent}%`; document.getElementById('progressText').textContent = `完成 ${p.completed} / ${p.total} (${p.percent}%)`; } catch{} }
+// 修复新建任务时未填写截止日期的显示问题
+async function onCreateSubmit(e) {
+  e.preventDefault();
+  const task = document.getElementById('m_task').value.trim();
+  const priority = document.getElementById('m_priority').value;
+  const mcatSel = document.getElementById('m_category_select').value;
+  const mcatNew = document.getElementById('m_category_new').value.trim();
+  const category = (mcatSel === '__new__' ? (mcatNew || '默认') : (mcatSel || '默认'));
+  const dueVal = document.getElementById('m_due').value; // '' or 'YYYY-MM-DD'
+  const due = dueVal || '暂无'; // 如果未填写日期，则设置为“暂无”
 
-function clearFilter(){ document.getElementById('filterPriority').value=''; document.getElementById('filterCategory').value=''; if(document.getElementById('filterCompleted')) document.getElementById('filterCompleted').value='all'; if(document.getElementById('sortDue')) document.getElementById('sortDue').value=''; loadTodos(); }
+  if (!task) {
+    showToast('请输入任务内容');
+    return;
+  }
+
+  try {
+    const res = await fetch(apiBase, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ task, priority, category, due })
+    });
+    const body = await res.json().catch(() => null);
+    console.log('POST', res.status, body);
+    if (res.ok) {
+      closeCreateModal();
+      // 清除筛选以便新项可见
+      document.getElementById('filterPriority').value = '';
+      document.getElementById('filterCategory').value = '';
+      if (document.getElementById('filterCompleted')) document.getElementById('filterCompleted').value = 'all';
+      if (document.getElementById('sortDue')) document.getElementById('sortDue').value = '';
+      await loadCategories();
+      await loadTodos();
+      loadProgress();
+      showToast('添加成功');
+    } else {
+      showToast('添加失败');
+      console.error('创建失败：', body);
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('网络错误');
+  }
+}
+
+// 修复 closeEditModal 函数，确保编辑模态框正确关闭
+function closeEditModal() {
+  const m = document.getElementById('editModal');
+  m.classList.remove('open');
+  m.setAttribute('aria-hidden', 'true');
+  document.getElementById('editForm').reset(); // 重置表单
+  document.getElementById('e_category_new').style.display = 'none'; // 隐藏新分类输入框
+  _currentEditId = null;
+}
 
 /* ---------- UI helpers ---------- */
 function showToast(msg, timeout=1500){ let t=document.getElementById('toast'); if(!t){ t=document.createElement('div'); t.id='toast'; t.className='toast'; document.body.appendChild(t); } t.textContent=msg; t.classList.add('visible'); clearTimeout(t._hideTimer); t._hideTimer=setTimeout(()=>t.classList.remove('visible'), timeout); }
