@@ -3,21 +3,21 @@
     /* Morandi-like muted palette (light) */
     --bg: #e9e6e3;       /* 背景 */
     --card: #ffffff;     /* 卡片 */
-    --text: #2f2b28;     /* 主要文字 */
-    --muted: #6b8291;    /* 次要文字：灰蓝（白天） */
-    --accent: #6a7880;   /* 按钮等强调色 */
-    --danger: #b54b4b;
-    --card-shadow: rgba(47,43,40,0.06);
+    --text: #282b2f;     /* 主要文字 */
+    --muted: #6b8291;    /* 次要文字 */
+    --accent: #2588c2;   /* 按钮等强调色 */
+    --danger: #c54f4f;
+    --card-shadow: rgba(40, 40, 47, 0.06);
     --select-bg: #f3f4f6; /* 下拉背景：白天淡灰 */
 }
 
 [data-theme="dark"]{
     /* Morandi-like dark variant (调整为暖黄文本以满足需求) */
-    --bg: #0f1111;            /* 更深的背景，避免白线透出 */
-    --card: #121314;
-    --text: #ffd84a;         /* 正黄色（温和且清晰） */
-    --muted: #9fb6c4;        /* 次要文字：灰蓝（夜间） */
-    --accent: #8b9a98;
+    --bg: #000000;            /* 更深的背景，避免白线透出 */
+    --card: #070f19;
+    --text: #ffffff;         /* 主要文字 */
+    --muted: #aec9dc;        /* 次要文字 */
+    --accent: #7b8ea1;
     --danger: #ff6b6b;
     --card-shadow: rgba(0,0,0,0.6);
     --select-bg: #1b1c1e; /* 下拉背景：夜间深灰 */
