@@ -38,10 +38,17 @@ def before_request():
     if current_app.my_list_1 is None:
         current_app.my_list_1 = TodoList()
 
+from flask import send_from_directory
+
+# 静态文件路由
+@app.route('/<path:filename>')
+def static_files(filename):
+    return send_from_directory('.', filename)
+
 @app.route('/')
 @app.route('/index')
 def index():
-    return "Welcome to the ToDo List API!<p>I'm DJ, a student of <i>ISSE</i>.</p>"
+    return send_from_directory('.', 'index.html')
 
 @app.route('/show_todos', methods=['GET', 'POST'])
 def show_todos():
