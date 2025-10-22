@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
 
@@ -21,6 +21,12 @@ def buildResponse(status, message="", data=None):
 def findTask(taskId):
     """在任务列表中查找指定 ID 的任务。"""
     return next((task for task in taskStore if task["id"] == taskId), None)
+
+
+@app.route("/")
+def index():
+    """渲染前端首页。"""
+    return render_template("index.html")
 
 
 @app.route("/tasks", methods=["GET"])
