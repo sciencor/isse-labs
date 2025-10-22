@@ -258,6 +258,78 @@ filterPriority.addEventListener('change', loadTasks);
 refreshBtn.addEventListener('click', loadTasks);
 clearBtn.addEventListener('click', clearInputs);
 
+// 在现有事件绑定与 loadTasks 调用之前初始化自定义下拉
+function createCustomSelect(select){
+    // wrapper
+    const wrapper = document.createElement('div');
+    wrapper.className = 'custom-select';
+    // trigger button with label and arrow
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'custom-select__trigger';
+    const label = document.createElement('span');
+    label.className = 'label';
+    label.textContent = select.options[select.selectedIndex]?.text || '';
+    const arrow = document.createElement('span');
+    arrow.className = 'arrow';
+    trigger.appendChild(label);
+    trigger.appendChild(arrow);
+
+    // options container
+    const opts = document.createElement('div');
+    opts.className = 'custom-options';
+    Array.from(select.options).forEach(opt => {
+        const o = document.createElement('div');
+        o.className = 'custom-option';
+        o.dataset.value = opt.value;
+        o.textContent = opt.text;
+        if (opt.disabled) o.classList.add('disabled');
+        if (opt.selected) o.classList.add('selected');
+        o.addEventListener('click', (e)=>{
+            select.value = opt.value;
+            // 触发原生 change 事件以驱动已有逻辑
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            // 更新显示
+            label.textContent = opt.text;
+            Array.from(opts.children).forEach(c=>c.classList.toggle('selected', c===o));
+            wrapper.classList.remove('open');
+        });
+        opts.appendChild(o);
+    });
+
+    // 插入到 DOM：放在原生 select 后面
+    select.parentNode.insertBefore(wrapper, select.nextSibling);
+    wrapper.appendChild(trigger);
+    wrapper.appendChild(opts);
+
+    // 隐藏原生 select（保留可访问性）
+    select.classList.add('hidden-select');
+
+    // toggle open
+    trigger.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        // 关闭其他打开的
+        document.querySelectorAll('.custom-select.open').forEach(cs => { if (cs !== wrapper) cs.classList.remove('open'); });
+        wrapper.classList.toggle('open');
+    });
+
+    // 点击外部关闭
+    document.addEventListener('click', (e)=>{ if (!wrapper.contains(e.target)) wrapper.classList.remove('open'); });
+
+    // 当原生 select 通过脚本改变时，更新自定义 UI
+    select.addEventListener('change', ()=>{
+        const selOpt = select.options[select.selectedIndex];
+        label.textContent = selOpt ? selOpt.text : '';
+        Array.from(opts.children).forEach(c=> c.classList.toggle('selected', c.dataset.value === select.value));
+    });
+}
+
+// 初始化需要自定义的 select（在页面加载时）
+['categorySelect','prioritySelect','sortSelect','filterCategory','filterPriority'].forEach(id=>{
+    const s = document.getElementById(id);
+    if (s) createCustomSelect(s);
+});
+
 // 初始加载
 loadTasks();
 </script>
