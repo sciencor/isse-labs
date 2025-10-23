@@ -6,7 +6,6 @@ const taskTitleInput = document.getElementById('task-title');
 const taskCategorySelect = document.getElementById('task-category');
 const taskPrioritySelect = document.getElementById('task-priority');
 const taskDeadlineInput = document.getElementById('task-deadline');
-const noDeadlineCheckbox = document.getElementById('no-deadline');
 const allDayCheckbox = document.getElementById('all-day');
 const addTaskBtn = document.getElementById('add-task-btn');
 const searchInput = document.getElementById('search-input');
@@ -70,27 +69,51 @@ window.addEventListener('DOMContentLoaded', () => {
     sortOptionSelect.addEventListener('change', applyFilters);
     showAllBtn.addEventListener('click', showAllTasks);
     
-    // 无截止日期复选框事件
-    noDeadlineCheckbox.addEventListener('change', () => {
-        if (noDeadlineCheckbox.checked) {
-            taskDeadlineInput.disabled = true;
-            allDayCheckbox.disabled = true;
-            allDayCheckbox.checked = false;
-        } else {
-            taskDeadlineInput.disabled = false;
-            allDayCheckbox.disabled = false;
-        }
-    });
+    // 获取设置截止时间按钮和截止时间区域元素
+    const deadlineSection = document.getElementById('deadline-section');
+    const setDeadlineBtn = document.getElementById('set-deadline-btn');
+    
+    // 设置截止时间按钮点击事件 - 切换显示截止时间选择器
+    if (setDeadlineBtn && deadlineSection) {
+        setDeadlineBtn.addEventListener('click', function() {
+            if (deadlineSection.style.display === 'none' || deadlineSection.style.display === '') {
+                // 显示截止时间选择器
+                deadlineSection.style.display = 'block';
+                // 更改按钮文字
+                setDeadlineBtn.textContent = '无截止时间';
+                // 设置默认时间
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                const formattedDate = tomorrow.toISOString().slice(0, 16);
+                taskDeadlineInput.value = formattedDate;
+                // 默认勾选全天
+                allDayCheckbox.checked = true;
+                // 禁用时间选择器
+                taskDeadlineInput.disabled = true;
+            } else {
+                // 隐藏截止时间选择器
+                deadlineSection.style.display = 'none';
+                // 恢复按钮文字
+                setDeadlineBtn.textContent = '设置截止时间';
+            }
+        });
+    }
     
     // 全天复选框事件
     allDayCheckbox.addEventListener('change', () => {
         if (allDayCheckbox.checked) {
-            // 如果选择全天，设置时间为当天00:00
+            // 如果选择全天，将时间设置为当天的00:00
             if (taskDeadlineInput.value) {
                 // 保持日期不变，只修改时间部分
                 const dateStr = taskDeadlineInput.value.split('T')[0];
                 taskDeadlineInput.value = dateStr + 'T00:00';
             }
+            // 禁用时间选择器
+            taskDeadlineInput.disabled = true;
+        } else {
+            // 启用时间选择器
+            taskDeadlineInput.disabled = false;
         }
     });
     
@@ -108,7 +131,7 @@ function createClearAllButton() {
     clearAllButton = document.createElement('button');
     clearAllButton.id = 'clear-all-button';
     clearAllButton.className = 'clear-all-button';
-    clearAllButton.textContent = '清除所有任务';
+    clearAllButton.textContent = '清除下列任务';
     clearAllButton.addEventListener('click', clearAllTasks);
     
     // 将按钮移动到任务列表标题栏右侧
@@ -193,54 +216,82 @@ async function loadTasks(filters = {}) {
 
 // 清除当前显示的任务
 async function clearAllTasks() {
-    // 获取当前显示在界面上的任务元素
-    const taskElements = document.querySelectorAll('.task-item');
-    if (taskElements.length === 0) {
-        if (typeof showMessage === 'function') {
-            showMessage('当前没有显示的任务可清除', 'info');
-        } else {
-            alert('当前没有显示的任务可清除');
-        }
-        return;
-    }
-    
-    // 获取当前显示任务的ID列表
-    const taskIds = Array.from(taskElements).map(element => {
-        return parseInt(element.getAttribute('data-task-id'));
-    }).filter(id => !isNaN(id));
-    
-    if (!confirm(`确定要清除当前显示的 ${taskIds.length} 个任务吗？此操作不可恢复。`)) {
-        return;
-    }
-    
     try {
-        // 逐个删除当前显示的任务
-        // 注意：这里也可以优化为批量删除的API调用
-        const deletePromises = taskIds.map(id => {
-            return fetch(`/tasks/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
+        // 获取当前显示的任务元素
+        const taskElements = document.querySelectorAll('#tasks-container .task-item');
+        
+        if (taskElements.length === 0) {
+            if (typeof showMessage === 'function') {
+                showMessage('当前没有任务可清除', 'info');
+            } else {
+                alert('当前没有任务可清除');
+            }
+            return;
+        }
+        
+        // 从任务元素中直接提取data-task-id属性
+        const taskIds = Array.from(taskElements).map(element => {
+            return parseInt(element.getAttribute('data-task-id'));
+        }).filter(id => !isNaN(id));
+        
+        if (taskIds.length === 0) {
+            if (typeof showMessage === 'function') {
+                showMessage('无法获取任务信息', 'error');
+            } else {
+                alert('无法获取任务信息');
+            }
+            return;
+        }
+        
+        if (!confirm(`确定要清除当前显示的 ${taskIds.length} 个任务吗？此操作不可恢复。`)) {
+            return;
+        }
+        // 使用单独处理每个Promise的方式，即使某个删除失败也继续执行其他删除
+        let successCount = 0;
+        let failCount = 0;
+        
+        for (const id of taskIds) {
+            try {
+                const response = await fetch(`/tasks/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    successCount++;
+                } else {
+                    failCount++;
+                    console.warn(`删除任务 ${id} 失败:`, response.status);
                 }
-            });
-        });
+            } catch (err) {
+                failCount++;
+                console.error(`删除任务 ${id} 出错:`, err);
+            }
+        }
         
-        const results = await Promise.all(deletePromises);
-        
-        // 检查是否有失败的删除操作
-        const failedResults = results.filter(response => !response.ok);
-        if (failedResults.length > 0) {
-            throw new Error(`部分任务删除失败，成功删除 ${results.length - failedResults.length} 个任务`);
+        // 如果有失败的情况，显示警告但不中断流程
+        if (failCount > 0) {
+            console.warn(`部分任务删除失败，成功删除 ${successCount} 个任务，失败 ${failCount} 个任务`);
         }
         
         // 重新加载任务列表
         await loadTasks();
         
-        // 显示成功消息
+        // 显示成功消息，包含实际成功删除的任务数量
         if (typeof showMessage === 'function') {
-            showMessage(`已成功清除 ${taskIds.length} 个任务`, 'success');
+            if (failCount > 0) {
+                showMessage(`部分任务已清除：成功删除 ${successCount} 个任务，失败 ${failCount} 个任务`, 'warning');
+            } else {
+                showMessage(`已成功清除当前显示的 ${successCount} 个任务`, 'success');
+            }
         } else {
-            alert(`已成功清除 ${taskIds.length} 个任务`);
+            if (failCount > 0) {
+                alert(`部分任务已清除：成功删除 ${successCount} 个任务，失败 ${failCount} 个任务`);
+            } else {
+                alert(`已成功清除当前显示的 ${successCount} 个任务`);
+            }
         }
     } catch (error) {
         console.error('清除任务时出错:', error);
@@ -409,7 +460,7 @@ function updateClearAllButtonState(hasTasks) {
         clearAllButton = document.createElement('button');
         clearAllButton.id = 'clear-all-button';
         clearAllButton.className = 'clear-all-button';
-        clearAllButton.textContent = '清除所有任务';
+        clearAllButton.textContent = '清除下列任务';
         clearAllButton.addEventListener('click', clearAllTasks);
         
         // 将按钮添加到过滤区域旁边
@@ -451,32 +502,36 @@ async function addTask() {
                 category,
                 priority,
                 deadline: (() => {
-                    // 如果选择了"无截止日期"，直接返回null
-                    if (noDeadlineCheckbox.checked) {
-                        return null;
-                    }
-                    
-                    // 如果有截止日期
-                    if (deadline) {
-                        try {
-                            // 对于全天任务，直接构造正确的日期字符串，避免时区转换问题
-                            if (allDayCheckbox.checked) {
-                                // 获取日期部分，设置时间为00:00:00
-                                const dateStr = deadline.split('T')[0];
-                                return dateStr + 'T00:00:00.000Z';
-                            } else {
-                                // 非全天任务，使用原始的日期处理
-                                const date = new Date(deadline);
-                                if (!isNaN(date.getTime())) {
-                                    return date.toISOString();
-                                }
-                            }
-                        } catch (e) {
-                            console.error('日期解析错误:', e);
-                        }
-                    }
-                    return null;
-                })()
+                      // 检查截止时间选择器是否显示
+                      const deadlineSection = document.getElementById('deadline-section');
+                      const deadlineValue = taskDeadlineInput.value;
+                      // 如果截止时间选择器未显示，或者没有输入截止时间，则无截止日期
+                      if (!deadlineSection || deadlineSection.style.display === 'none' || deadlineSection.style.display === '' || !deadlineValue) {
+                          return null;
+                      }
+                      
+                     // 如果有截止日期
+                     if (deadlineValue) {
+                         try {
+                             // 对于全天任务，直接构造正确的日期字符串，避免时区转换问题
+                             if (allDayCheckbox.checked) {
+                                 // 获取日期部分，设置时间为00:00:00
+                                 const dateStr = deadlineValue.split('T')[0];
+                                 return dateStr + 'T00:00:00.000Z';
+                             } else {
+                                 // 非全天任务，使用原始的日期处理
+                                 const date = new Date(deadlineValue);
+                                 if (!isNaN(date.getTime())) {
+                                     return date.toISOString();
+                                 }
+                             }
+                         } catch (e) {
+                             console.error('日期解析错误:', e);
+                         }
+                     }
+                     return null;
+                 })(),
+                isAllDay: allDayCheckbox.checked
             })
         });
         
@@ -626,9 +681,12 @@ function isTaskOverdue(deadline) {
     const isAllDayTask = deadline.endsWith('T00:00:00.000Z');
     if (isAllDayTask) {
         // 对于全天任务，只比较日期部分，不考虑时间和时区
+        // 注意：对于全天任务，如果截止日期是昨天，则认为已过期
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const deadlineDate = new Date(deadline);
+        // 将截止日期设置为当天的23:59:59，这样如果今天00:00之前的全天任务都算过期
+        deadlineDate.setHours(23, 59, 59, 999);
         return deadlineDate < today;
     }
     return new Date(deadline) < new Date();
@@ -684,13 +742,23 @@ function formatDeadline(deadline) {
             const [year, month, day] = dateStr.split('-');
             let displayText = `${month}/${day} (全天)`;
         
-            if (diffDays === 0) {
+            // 为全天任务创建一个只包含年月日的日期对象进行比较
+            const taskDate = new Date(year, month - 1, day);
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            // 比较日期部分，避免时区问题
+            if (taskDate.getTime() === today.getTime()) {
                 displayText += ' (今天)';
-            } else if (diffDays === 1) {
+            } else if (taskDate.getTime() === tomorrow.getTime()) {
                 displayText += ' (明天)';
-            } else if (diffDays > 1 && diffDays <= 7) {
-                displayText += ` (${diffDays}天后)`;
-            } else if (diffDays < 0) {
+            } else if (taskDate > today && taskDate <= new Date(tomorrow.getTime() + 6 * 24 * 60 * 60 * 1000)) {
+                // 7天内的任务
+                const daysDiff = Math.floor((taskDate - today) / (1000 * 60 * 60 * 24));
+                displayText += ` (${daysDiff}天后)`;
+            } else if (taskDate < today) {
+                // 只有当任务日期早于今天时才标记为已过期
                 displayText += ' (已过期)';
             }
             

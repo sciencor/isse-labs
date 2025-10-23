@@ -13,34 +13,37 @@
         <!-- 输入区 -->
         <div class="input-section">
             <div class="input-group">
-                <div class="input-row">
+                <!-- 第一行：任务标题和添加按钮 -->
+                <div class="input-row input-row-first">
                     <input type="text" id="task-title" placeholder="输入任务标题..." required>
-                    <select id="task-category">
-                        <option value="学习">学习</option>
-                        <option value="工作">工作</option>
-                        <option value="生活">生活</option>
-                    </select>
-                    <select id="task-priority">
-                        <option value="低">低</option>
-                        <option value="中">中</option>
-                        <option value="高">高</option>
-                    </select>
+                    <button id="add-task-btn" class="add-task-btn">添加任务</button>
                 </div>
-                <div class="deadline-section">
+                
+                <!-- 第二行：分类、优先级和设置截止时间按钮 -->
+                <div class="input-row input-row-second">
+                    <div class="dropdowns-group">
+                        <select id="task-category">
+                            <option value="学习">学习</option>
+                            <option value="工作">工作</option>
+                            <option value="生活">生活</option>
+                        </select>
+                        <select id="task-priority">
+                            <option value="低">低</option>
+                            <option value="中">中</option>
+                            <option value="高">高</option>
+                        </select>
+                    </div>
+                    <button id="set-deadline-btn" class="set-deadline-btn">设置截止时间</button>
+                </div>
+                
+                <!-- 截止时间选择器（默认隐藏） -->
+                <div class="deadline-section" id="deadline-section" style="display: none;">
                     <div class="date-input-group">
                         <input type="datetime-local" id="task-deadline">
                         <label>
                             <input type="checkbox" id="all-day"> 全天
                         </label>
                     </div>
-                    <div class="no-deadline-group">
-                        <label>
-                            <input type="checkbox" id="no-deadline"> 无截止日期
-                        </label>
-                    </div>
-                </div>
-                <div class="input-row">
-                    <button id="add-task-btn" class="add-task-btn">添加任务</button>
                 </div>
             </div>
         </div>
@@ -56,8 +59,14 @@
         <!-- 筛选区 -->
         <div class="filter-section">
             <div class="filter-group">
+                <select id="filter-status">
+                    <option value="">全部状态</option>
+                    <option value="pending">未完成且未截止</option>
+                    <option value="completed">已完成</option>
+                    <option value="overdue">已截止且未完成</option>
+                </select>
                 <select id="filter-category">
-                    <option value="">全部分类</option>
+                    <option value="">全部类别</option>
                     <option value="学习">学习</option>
                     <option value="工作">工作</option>
                     <option value="生活">生活</option>
@@ -68,18 +77,12 @@
                     <option value="中">中</option>
                     <option value="高">高</option>
                 </select>
-                <select id="filter-status">
-                    <option value="">全部状态</option>
-                    <option value="pending">未完成且未截止</option>
-                    <option value="completed">已完成</option>
-                    <option value="overdue">已截止且未完成</option>
-                </select>
                 <select id="sort-option">
                     <option value="">默认排序</option>
                     <option value="deadline_asc">截止时间正序</option>
                     <option value="deadline_desc">截止时间倒序</option>
                 </select>
-                <button id="show-all-btn">显示全部</button>
+                <button id="show-all-btn">重置</button>
             </div>
         </div>
         

@@ -66,7 +66,7 @@ h2 {
 
 /* 输入区样式 */
 .input-section {
-    background-color: #fff;
+    background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -77,50 +77,75 @@ h2 {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    align-items: flex-start;
 }
 
-.input-row {
+/* 第一行：任务标题和添加按钮 */
+.input-row-first {
     display: flex;
     gap: 10px;
     align-items: center;
-    flex-wrap: wrap;
-    width: 100%;
 }
 
-.input-row input, .input-row select {
-    padding: 10px;
+.input-row-first input[type="text"] {
+    flex: 1;
+    padding: 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 16px;
 }
 
-.input-row input[type="text"] {
-    flex: 2;
-    min-width: 200px;
-}
-
-.input-row select {
-    flex: 1;
-    min-width: 100px;
-}
-
-.deadline-section {
+/* 第二行：分类、优先级和设置截止时间按钮 */
+.input-row-second {
     display: flex;
     gap: 20px;
     align-items: center;
-    flex-wrap: wrap;
+}
+
+/* 紧凑排列的下拉菜单组 */
+.dropdowns-group {
+    display: flex;
+    gap: 8px;
+}
+
+.dropdowns-group select {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+    min-width: 100px;
+}
+
+/* 设置截止时间按钮 */
+.set-deadline-btn {
+    padding: 10px 16px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.set-deadline-btn:hover {
+    background-color: #2563eb;
+}
+
+/* 截止时间选择器 */
+.deadline-section {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #f8fafc;
+    border-radius: 4px;
+    border-left: 4px solid #3b82f6;
     width: 100%;
 }
 
 .date-input-group {
     display: flex;
-    gap: 10px;
     align-items: center;
-    background-color: #f9f9f9;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #e0e0e0;
+    gap: 10px;
 }
 
 .date-input-group input[type="datetime-local"] {
@@ -129,26 +154,10 @@ h2 {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    font-size: 14px;
 }
 
-.no-deadline-group {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 10px 15px;
-    background-color: #f5f5f5;
-    border-radius: 6px;
-    border: 1px solid #e0e0e0;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.no-deadline-group:hover {
-    background-color: #eeeeee;
-}
-
-.date-input-group label,
-.no-deadline-group label {
+.date-input-group label {
     display: flex;
     align-items: center;
     gap: 5px;
@@ -156,8 +165,7 @@ h2 {
     margin: 0;
 }
 
-.date-input-group label input[type="checkbox"],
-.no-deadline-group label input[type="checkbox"] {
+.date-input-group label input[type="checkbox"] {
     margin: 0;
 }
 
