@@ -58,6 +58,13 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // 添加事件监听器
     addTaskBtn.addEventListener('click', addTask);
+    // 为任务输入框添加回车键事件监听器
+    taskTitleInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTask();
+        }
+    });
     searchBtn.addEventListener('click', () => searchTasks(searchInput.value));
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') searchTasks(searchInput.value);
@@ -89,13 +96,15 @@ window.addEventListener('DOMContentLoaded', () => {
                 taskDeadlineInput.value = formattedDate;
                 // 默认勾选全天
                 allDayCheckbox.checked = true;
-                // 禁用时间选择器
-                taskDeadlineInput.disabled = true;
+                // 添加全天样式类
+                taskDeadlineInput.classList.add('all-day-mode');
             } else {
                 // 隐藏截止时间选择器
                 deadlineSection.style.display = 'none';
                 // 恢复按钮文字
                 setDeadlineBtn.textContent = '设置截止时间';
+                // 移除全天样式类
+                taskDeadlineInput.classList.remove('all-day-mode');
             }
         });
     }
@@ -109,11 +118,51 @@ window.addEventListener('DOMContentLoaded', () => {
                 const dateStr = taskDeadlineInput.value.split('T')[0];
                 taskDeadlineInput.value = dateStr + 'T00:00';
             }
-            // 禁用时间选择器
-            taskDeadlineInput.disabled = true;
+            // 添加全天样式类
+            taskDeadlineInput.classList.add('all-day-mode');
         } else {
-            // 启用时间选择器
-            taskDeadlineInput.disabled = false;
+            // 移除全天样式类
+            taskDeadlineInput.classList.remove('all-day-mode');
+        }
+    });
+    
+    // 监听时间变化，当处于全天模式时，自动重置时间为00:00
+    taskDeadlineInput.addEventListener('change', () => {
+        if (allDayCheckbox.checked && taskDeadlineInput.value) {
+            const dateStr = taskDeadlineInput.value.split('T')[0];
+            taskDeadlineInput.value = dateStr + 'T00:00';
+        }
+    });
+    
+    // 增强全天模式的交互 - 捕获键盘事件，阻止编辑时间部分
+    taskDeadlineInput.addEventListener('keydown', (e) => {
+        if (allDayCheckbox.checked) {
+            // 获取输入框中光标位置
+            const cursorPos = taskDeadlineInput.selectionStart;
+            const value = taskDeadlineInput.value;
+            
+            // 检查光标是否在时间部分（T后面的部分）
+            const tIndex = value.indexOf('T');
+            if (tIndex !== -1 && cursorPos > tIndex) {
+                // 允许删除整个时间部分
+                if (e.key === 'Backspace' && cursorPos === tIndex + 1) {
+                    return true; // 允许删除
+                }
+                // 阻止编辑时间部分
+                e.preventDefault();
+            }
+        }
+    });
+    
+    // 处理点击事件，确保在全天模式下点击时间部分时自动重置
+    taskDeadlineInput.addEventListener('click', (e) => {
+        if (allDayCheckbox.checked) {
+            setTimeout(() => {
+                if (taskDeadlineInput.value) {
+                    const dateStr = taskDeadlineInput.value.split('T')[0];
+                    taskDeadlineInput.value = dateStr + 'T00:00';
+                }
+            }, 0);
         }
     });
     

@@ -5,6 +5,24 @@
     box-sizing: border-box;
 }
 
+/* 全天模式样式 - 时间选择部分显示为只读效果 */
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-ampm-field,
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-hour-field,
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-minute-field,
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-second-field,
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-millisecond-field,
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-meridiem-field {
+    background-color: #f0f0f0;
+    color: #999;
+    position: relative;
+}
+
+/* 为Firefox和其他浏览器提供回退样式 */
+input[type="datetime-local"].all-day-mode {
+    background-color: #fcfcfc;
+    border: 1px solid #ddd;
+}
+
 body {
     font-family: 'Microsoft YaHei', Arial, sans-serif;
     background-color: #f5f5f5;
