@@ -54,9 +54,26 @@
     <div id="taskList" class="task-list"></div>
   </div>
 
+  <!-- 编辑任务模态框 -->
+  <div id="edit-modal">
+    <div class="modal-content">
+      <h2>编辑任务</h2>
+      <input type="text" id="edit-title" placeholder="任务名称">
+      <input type="text" id="edit-category" placeholder="分类">
+      <select id="edit-priority">
+        <option value="高">高</option>
+        <option value="中">中</option>
+        <option value="低">低</option>
+      </select>
+      <button id="save-edit">保存修改</button>
+      <button id="cancel-edit">取消</button>
+    </div>
+  </div>
+
   <!-- 烟花特效容器 -->
   <canvas id="fireworks"></canvas>
 
+  <!-- JS脚本 -->
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

@@ -90,25 +90,30 @@ def add_task():
     }), 201
 
 # -------------------------------
-# 路由 4: 修改任务状态
+# 路由 4: 修改任务状态、名称、类别或优先级
 # -------------------------------
 @app.route("/tasks/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    """修改任务状态（完成/未完成）"""
-    data = request.json
+    """更新任务，可以修改 completed/title/category/priority"""
+    data = request.get_json() or {}
     for task in tasks:
         if task["id"] == task_id:
-            task["completed"] = data.get("completed", task["completed"])
+            # 更新允许的字段（如果客户端提供）
+            if "completed" in data:
+                task["completed"] = bool(data["completed"])
+            if "title" in data:
+                task["title"] = data["title"]
+            if "category" in data:
+                task["category"] = data["category"]
+            if "priority" in data:
+                task["priority"] = data["priority"]
             save_tasks()
             return jsonify({
                 "status": "success",
                 "data": task,
-                "message": "任务状态已更新"
+                "message": "任务已更新"
             })
-    return jsonify({
-        "status": "error",
-        "message": "任务未找到"
-    }), 404
+    return jsonify({"status": "error", "message": "任务未找到"}), 404
 
 # -------------------------------
 # 路由 5: 删除任务
