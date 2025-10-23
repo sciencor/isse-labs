@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import json
 import os
 from datetime import datetime
@@ -63,13 +63,13 @@ def get_next_id(tasks):
 def is_overdue(deadline):
     """检查任务是否已截止"""
     try:
-        if not deadline:
+        if not deadline or deadline == 'null':
             return False
         # 确保能够正确解析ISO格式的日期时间字符串
         deadline_time = datetime.fromisoformat(deadline.replace('Z', '+00:00'))
-        current_time = datetime.now()
-        # 为了调试，打印比较信息
-        print(f"比较时间: {deadline_time} < {current_time} = {deadline_time < current_time}")
+        # 获取带有时区的当前时间，使用UTC
+        from datetime import timezone
+        current_time = datetime.now(timezone.utc)
         return deadline_time < current_time
     except Exception as e:
         print(f"解析截止日期错误: {e}")
@@ -229,7 +229,7 @@ def add_task():
                 "message": f"无效的优先级，可选值: {', '.join(valid_priorities)}"
             }), 400
         
-        # 验证截止日期格式
+        # 验证截止日期格式（支持空值，不强制要求）
         if data.get('deadline'):
             try:
                 # 尝试解析日期时间以验证格式
@@ -240,6 +240,7 @@ def add_task():
                     "data": None,
                     "message": "无效的截止日期格式，请使用ISO格式"
                 }), 400
+        # 空截止时间或null值直接通过验证，不报错
         
         # 创建新任务
         new_task = {
@@ -377,6 +378,27 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
+
+# 添加根路由，用于直接访问前端页面
+@app.route('/')
+def index():
+    """提供首页"""
+    try:
+        # 直接返回index.html文件内容
+        with open('index.html', 'r', encoding='utf-8') as f:
+            return f.read()
+    except Exception as e:
+        print(f"读取index.html失败: {e}")
+        return "首页加载失败", 500
+
+# 直接为关键静态文件添加路由
+@app.route('/style.css')
+def serve_css():
+    return send_from_directory('.', 'style.css', mimetype='text/css')
+
+@app.route('/script.js')
+def serve_js():
+    return send_from_directory('.', 'script.js', mimetype='application/javascript')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

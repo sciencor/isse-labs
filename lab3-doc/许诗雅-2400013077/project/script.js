@@ -6,6 +6,8 @@ const taskTitleInput = document.getElementById('task-title');
 const taskCategorySelect = document.getElementById('task-category');
 const taskPrioritySelect = document.getElementById('task-priority');
 const taskDeadlineInput = document.getElementById('task-deadline');
+const noDeadlineCheckbox = document.getElementById('no-deadline');
+const allDayCheckbox = document.getElementById('all-day');
 const addTaskBtn = document.getElementById('add-task-btn');
 const searchInput = document.getElementById('search-input');
 const searchBtn = document.getElementById('search-btn');
@@ -16,12 +18,15 @@ const sortOptionSelect = document.getElementById('sort-option');
 const showAllBtn = document.getElementById('show-all-btn');
 const tasksContainer = document.getElementById('tasks-container');
 
+// 为了解决截止时间格式问题，我们将在addTask函数中直接处理日期转换
+
 // 初始化页面
 window.addEventListener('DOMContentLoaded', () => {
-    // 设置默认截止时间为明天
+    // 设置默认截止时间为明天，时间部分设为00:00
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const formattedDate = tomorrow.toISOString().slice(0, 16);
+    tomorrow.setHours(0, 0, 0, 0); // 设置时间为00:00:00
+    const formattedDate = tomorrow.toISOString().slice(0, 16); // 保留到分钟
     taskDeadlineInput.value = formattedDate;
     
     // 加载任务
@@ -39,6 +44,30 @@ window.addEventListener('DOMContentLoaded', () => {
     filterStatusSelect.addEventListener('change', applyFilters);
     sortOptionSelect.addEventListener('change', applyFilters);
     showAllBtn.addEventListener('click', showAllTasks);
+    
+    // 无截止日期复选框事件
+    noDeadlineCheckbox.addEventListener('change', () => {
+        if (noDeadlineCheckbox.checked) {
+            taskDeadlineInput.disabled = true;
+            allDayCheckbox.disabled = true;
+            allDayCheckbox.checked = false;
+        } else {
+            taskDeadlineInput.disabled = false;
+            allDayCheckbox.disabled = false;
+        }
+    });
+    
+    // 全天复选框事件
+    allDayCheckbox.addEventListener('change', () => {
+        if (allDayCheckbox.checked) {
+            // 如果选择全天，设置时间为当天00:00
+            if (taskDeadlineInput.value) {
+                // 保持日期不变，只修改时间部分
+                const dateStr = taskDeadlineInput.value.split('T')[0];
+                taskDeadlineInput.value = dateStr + 'T00:00';
+            }
+        }
+    });
 });
 
 /**
@@ -123,7 +152,7 @@ function renderTasks(tasks) {
         
         // 截止时间
         const deadline = document.createElement('span');
-        deadline.className = `task-deadline ${isDeadlineSoon && !task.completed ? 'deadline-soon' : ''}`;
+        deadline.className = `task-deadline ${isDeadlineSoon && !task.completed ? 'deadline-soon' : ''} ${isOverdue ? 'overdue' : ''}`;
         deadline.textContent = formatDeadline(task.deadline);
         
         taskMeta.appendChild(category);
@@ -196,7 +225,33 @@ async function addTask() {
                 title,
                 category,
                 priority,
-                deadline: deadline ? new Date(deadline).toISOString() : null
+                deadline: (() => {
+                    // 如果选择了"无截止日期"，直接返回null
+                    if (noDeadlineCheckbox.checked) {
+                        return null;
+                    }
+                    
+                    // 如果有截止日期
+                    if (deadline) {
+                        try {
+                            // 对于全天任务，直接构造正确的日期字符串，避免时区转换问题
+                            if (allDayCheckbox.checked) {
+                                // 获取日期部分，设置时间为00:00:00
+                                const dateStr = deadline.split('T')[0];
+                                return dateStr + 'T00:00:00.000Z';
+                            } else {
+                                // 非全天任务，使用原始的日期处理
+                                const date = new Date(deadline);
+                                if (!isNaN(date.getTime())) {
+                                    return date.toISOString();
+                                }
+                            }
+                        } catch (e) {
+                            console.error('日期解析错误:', e);
+                        }
+                    }
+                    return null;
+                })()
             })
         });
         
@@ -336,6 +391,15 @@ function showAllTasks() {
  */
 function isTaskOverdue(deadline) {
     if (!deadline) return false;
+    // 检查是否为全天任务
+    const isAllDayTask = deadline.endsWith('T00:00:00.000Z');
+    if (isAllDayTask) {
+        // 对于全天任务，只比较日期部分，不考虑时间和时区
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const deadlineDate = new Date(deadline);
+        return deadlineDate < today;
+    }
     return new Date(deadline) < new Date();
 }
 
@@ -366,30 +430,53 @@ function formatDeadline(deadline) {
         const diffTime = date - now;
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         
-        let formattedDate = date.toLocaleString('zh-CN', {
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        // 检查是否为全天任务（通过字符串格式检测）
+        const isAllDayTask = deadline.endsWith('T00:00:00.000Z');
         
-        if (diffDays === 0) {
-            const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-            if (diffHours === 0) {
-                const diffMinutes = Math.floor(diffTime / (1000 * 60));
-                formattedDate += ` (${diffMinutes}分钟后)`;
-            } else {
-                formattedDate += ` (${diffHours}小时后)`;
+        if (isAllDayTask) {
+                // 全天任务只显示日期，直接从字符串中提取日期部分避免时区问题
+                const dateStr = deadline.split('T')[0];
+                const [year, month, day] = dateStr.split('-');
+                let formattedDate = `${month}/${day} (全天)`;
+            
+            if (diffDays === 0) {
+                formattedDate += ' (今天)';
+            } else if (diffDays === 1) {
+                formattedDate += ' (明天)';
+            } else if (diffDays > 1 && diffDays <= 7) {
+                formattedDate += ` (${diffDays}天后)`;
+            } else if (diffDays < 0) {
+                formattedDate += ' (已过期)';
             }
-        } else if (diffDays === 1) {
-            formattedDate += ' (明天)';
-        } else if (diffDays > 1 && diffDays <= 7) {
-            formattedDate += ` (${diffDays}天后)`;
-        } else if (diffDays < 0) {
-            formattedDate += ' (已过期)';
+            
+            return formattedDate;
+        } else {
+            // 非全天任务显示日期和时间
+            let formattedDate = date.toLocaleString('zh-CN', {
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            if (diffDays === 0) {
+                const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+                if (diffHours === 0) {
+                    const diffMinutes = Math.floor(diffTime / (1000 * 60));
+                    formattedDate += ` (${diffMinutes}分钟后)`;
+                } else {
+                    formattedDate += ` (${diffHours}小时后)`;
+                }
+            } else if (diffDays === 1) {
+                formattedDate += ' (明天)';
+            } else if (diffDays > 1 && diffDays <= 7) {
+                formattedDate += ` (${diffDays}天后)`;
+            } else if (diffDays < 0) {
+                formattedDate += ' (已过期)';
+            }
+            
+            return formattedDate;
         }
-        
-        return formattedDate;
     } catch {
         return deadline;
     }
