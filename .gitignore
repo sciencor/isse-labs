@@ -3,3 +3,6 @@
 .env
 *.pdf
 API_KEY.env
+
+# history
+lab2-doc/
