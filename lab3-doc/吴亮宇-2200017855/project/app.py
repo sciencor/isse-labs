@@ -1,10 +1,9 @@
 # app.py
 # --------------------------
-# TodoList 后端主程序
-# 提供任务的增删改查 RESTful API
+# TodoList 后端主程序（支持前端页面）
 # --------------------------
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 import uuid
 
@@ -30,6 +29,15 @@ tasks = [
         "completed": False
     }
 ]
+
+
+# --------------------------
+# 页面路由（主页）
+# --------------------------
+@app.route("/")
+def index():
+    """渲染前端主页面"""
+    return render_template("index.html")
 
 
 # --------------------------
@@ -69,9 +77,8 @@ def get_tasks():
 def add_task():
     """新增一个任务"""
     data = request.get_json()
-
-    # 参数校验
     required_fields = ["title", "category", "priority"]
+
     if not all(field in data for field in required_fields):
         return jsonify({
             "status": "error",
