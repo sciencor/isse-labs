@@ -18,14 +18,39 @@ const sortOptionSelect = document.getElementById('sort-option');
 const showAllBtn = document.getElementById('show-all-btn');
 const tasksContainer = document.getElementById('tasks-container');
 
+// 自定义tooltip元素
+let customTooltip = null;
+
+// 创建自定义tooltip
+function createCustomTooltip() {
+    if (customTooltip) return;
+    
+    customTooltip = document.createElement('div');
+    customTooltip.className = 'custom-tooltip';
+    customTooltip.style.position = 'fixed';
+    customTooltip.style.pointerEvents = 'none';
+    customTooltip.style.opacity = '0';
+    customTooltip.style.transition = 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out';
+    customTooltip.style.transform = 'translateY(5px)';
+    customTooltip.style.zIndex = '1000';
+    customTooltip.style.padding = '4px 8px';
+    customTooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    customTooltip.style.color = 'white';
+    customTooltip.style.borderRadius = '4px';
+    customTooltip.style.fontSize = '12px';
+    customTooltip.style.whiteSpace = 'nowrap';
+    
+    document.body.appendChild(customTooltip);
+}
+
 // 为了解决截止时间格式问题，我们将在addTask函数中直接处理日期转换
 
 // 初始化页面
 window.addEventListener('DOMContentLoaded', () => {
-    // 设置默认截止时间为明天，时间部分设为00:00
+    // 设置默认截止时间为明天，时间部分设为16:00
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0); // 设置时间为00:00:00
+    tomorrow.setHours(16, 0, 0, 0); // 设置时间为16:00:00
     const formattedDate = tomorrow.toISOString().slice(0, 16); // 保留到分钟
     taskDeadlineInput.value = formattedDate;
     
@@ -68,7 +93,55 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    
+    // 创建并添加清除所有任务按钮
+    createClearAllButton();
 });
+
+// 创建清除所有任务按钮
+function createClearAllButton() {
+    // 检查按钮是否已存在
+    let clearAllButton = document.getElementById('clear-all-button');
+    if (clearAllButton) return;
+    
+    // 创建按钮
+    clearAllButton = document.createElement('button');
+    clearAllButton.id = 'clear-all-button';
+    clearAllButton.className = 'clear-all-button';
+    clearAllButton.textContent = '清除所有任务';
+    clearAllButton.addEventListener('click', clearAllTasks);
+    
+    // 将按钮移动到任务列表标题栏右侧
+    const tasksSection = document.querySelector('.tasks-section');
+    if (tasksSection) {
+        // 查找或创建标题容器
+        let titleContainer = tasksSection.querySelector('.section-header');
+        if (!titleContainer) {
+            // 创建标题容器，包含标题和按钮
+            titleContainer = document.createElement('div');
+            titleContainer.className = 'section-header';
+            
+            // 查找任务列表标题
+            const taskListTitle = tasksSection.querySelector('h2');
+            if (taskListTitle) {
+                // 将标题移动到容器中
+                tasksSection.insertBefore(titleContainer, taskListTitle);
+                titleContainer.appendChild(taskListTitle);
+                
+                // 添加按钮到容器中
+                titleContainer.appendChild(clearAllButton);
+            }
+        } else {
+            // 如果已存在标题容器，直接添加按钮
+            titleContainer.appendChild(clearAllButton);
+        }
+    }
+    
+    // 初始更新按钮状态
+    if (typeof updateClearAllButtonState === 'function') {
+        updateClearAllButtonState(false);
+    }
+}
 
 /**
  * 加载任务列表
@@ -118,6 +191,67 @@ async function loadTasks(filters = {}) {
     }
 }
 
+// 清除当前显示的任务
+async function clearAllTasks() {
+    // 获取当前显示在界面上的任务元素
+    const taskElements = document.querySelectorAll('.task-item');
+    if (taskElements.length === 0) {
+        if (typeof showMessage === 'function') {
+            showMessage('当前没有显示的任务可清除', 'info');
+        } else {
+            alert('当前没有显示的任务可清除');
+        }
+        return;
+    }
+    
+    // 获取当前显示任务的ID列表
+    const taskIds = Array.from(taskElements).map(element => {
+        return parseInt(element.getAttribute('data-task-id'));
+    }).filter(id => !isNaN(id));
+    
+    if (!confirm(`确定要清除当前显示的 ${taskIds.length} 个任务吗？此操作不可恢复。`)) {
+        return;
+    }
+    
+    try {
+        // 逐个删除当前显示的任务
+        // 注意：这里也可以优化为批量删除的API调用
+        const deletePromises = taskIds.map(id => {
+            return fetch(`/tasks/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        });
+        
+        const results = await Promise.all(deletePromises);
+        
+        // 检查是否有失败的删除操作
+        const failedResults = results.filter(response => !response.ok);
+        if (failedResults.length > 0) {
+            throw new Error(`部分任务删除失败，成功删除 ${results.length - failedResults.length} 个任务`);
+        }
+        
+        // 重新加载任务列表
+        await loadTasks();
+        
+        // 显示成功消息
+        if (typeof showMessage === 'function') {
+            showMessage(`已成功清除 ${taskIds.length} 个任务`, 'success');
+        } else {
+            alert(`已成功清除 ${taskIds.length} 个任务`);
+        }
+    } catch (error) {
+        console.error('清除任务时出错:', error);
+        if (typeof showMessage === 'function') {
+            showMessage('清除任务失败: ' + error.message, 'error');
+        } else {
+            alert('清除任务失败: ' + error.message);
+        }
+    }
+}
+
 /**
  * 渲染任务列表
  * @param {Array} tasks - 任务数组
@@ -136,6 +270,7 @@ function renderTasks(tasks) {
     tasks.forEach(task => {
         const taskItem = document.createElement('div');
         taskItem.className = 'task-item';
+        taskItem.setAttribute('data-task-id', task.id);
         
         // 检查任务状态
         const isOverdue = isTaskOverdue(task.deadline);
@@ -169,7 +304,49 @@ function renderTasks(tasks) {
         // 截止时间
         const deadline = document.createElement('span');
         deadline.className = `task-deadline ${isDeadlineSoon && !task.completed ? 'deadline-soon' : ''} ${isOverdue ? 'overdue' : ''}`;
-        deadline.textContent = formatDeadline(task.deadline);
+        const deadlineInfo = formatDeadline(task.deadline);
+        deadline.textContent = deadlineInfo.displayText;
+        
+        // 添加自定义悬停提示
+        if (deadlineInfo.fullDate !== '无截止时间') {
+            deadline.dataset.tooltip = deadlineInfo.fullDate;
+            
+            deadline.addEventListener('mouseenter', (e) => {
+                createCustomTooltip();
+                customTooltip.textContent = deadline.dataset.tooltip;
+                
+                const rect = deadline.getBoundingClientRect();
+                const tooltipRect = customTooltip.getBoundingClientRect();
+                
+                // 计算tooltip位置，显示在元素上方
+                customTooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
+                customTooltip.style.top = `${rect.top - tooltipRect.height - 8}px`;
+                
+                // 显示tooltip并添加动画
+                setTimeout(() => {
+                    customTooltip.style.opacity = '1';
+                    customTooltip.style.transform = 'translateY(0)';
+                }, 10);
+            });
+            
+            deadline.addEventListener('mouseleave', () => {
+                if (customTooltip) {
+                    customTooltip.style.opacity = '0';
+                    customTooltip.style.transform = 'translateY(5px)';
+                }
+            });
+            
+            deadline.addEventListener('mousemove', (e) => {
+                // 轻微调整tooltip位置，跟随鼠标但保持相对元素居中
+                if (customTooltip) {
+                    const rect = deadline.getBoundingClientRect();
+                    const tooltipRect = customTooltip.getBoundingClientRect();
+                    
+                    customTooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
+                    customTooltip.style.top = `${rect.top - tooltipRect.height - 8}px`;
+                }
+            });
+        }
         
         taskMeta.appendChild(category);
         taskMeta.appendChild(priority);
@@ -215,6 +392,38 @@ function renderTasks(tasks) {
         
         tasksContainer.appendChild(taskItem);
     });
+    
+    // 更新清除所有任务按钮状态
+    if (typeof updateClearAllButtonState === 'function') {
+        updateClearAllButtonState(tasks.length > 0);
+    }
+}
+
+// 更新清除所有任务按钮状态
+function updateClearAllButtonState(hasTasks) {
+    // 检查按钮是否已存在
+    let clearAllButton = document.getElementById('clear-all-button');
+    
+    // 如果按钮不存在且有任务，则创建按钮
+    if (!clearAllButton && hasTasks) {
+        clearAllButton = document.createElement('button');
+        clearAllButton.id = 'clear-all-button';
+        clearAllButton.className = 'clear-all-button';
+        clearAllButton.textContent = '清除所有任务';
+        clearAllButton.addEventListener('click', clearAllTasks);
+        
+        // 将按钮添加到过滤区域旁边
+        const filterSection = document.querySelector('.filter-section');
+        if (filterSection) {
+            filterSection.appendChild(clearAllButton);
+        }
+    }
+    
+    // 如果按钮存在，设置其可用性状态
+    if (clearAllButton) {
+        clearAllButton.disabled = !hasTasks;
+        clearAllButton.classList.toggle('disabled', !hasTasks);
+    }
 }
 
 /**
@@ -441,10 +650,15 @@ function isTaskDeadlineSoon(deadline) {
 /**
  * 格式化截止时间显示
  * @param {string} deadline - 截止时间
- * @returns {string} 格式化后的时间
+ * @returns {Object} 包含显示文本和完整日期信息的对象
  */
 function formatDeadline(deadline) {
-    if (!deadline) return '无截止时间';
+    if (!deadline) {
+        return {
+            displayText: '无截止时间',
+            fullDate: '无截止时间'
+        };
+    }
     
     try {
         const date = new Date(deadline);
@@ -455,26 +669,38 @@ function formatDeadline(deadline) {
         // 检查是否为全天任务（通过字符串格式检测）
         const isAllDayTask = deadline.endsWith('T00:00:00.000Z');
         
+        // 完整日期信息（用于悬停显示）
+        const fullDate = date.toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
         if (isAllDayTask) {
-                // 全天任务只显示日期，直接从字符串中提取日期部分避免时区问题
-                const dateStr = deadline.split('T')[0];
-                const [year, month, day] = dateStr.split('-');
-                let formattedDate = `${month}/${day} (全天)`;
-            
+            // 全天任务只显示日期，直接从字符串中提取日期部分避免时区问题
+            const dateStr = deadline.split('T')[0];
+            const [year, month, day] = dateStr.split('-');
+            let displayText = `${month}/${day} (全天)`;
+        
             if (diffDays === 0) {
-                formattedDate += ' (今天)';
+                displayText += ' (今天)';
             } else if (diffDays === 1) {
-                formattedDate += ' (明天)';
+                displayText += ' (明天)';
             } else if (diffDays > 1 && diffDays <= 7) {
-                formattedDate += ` (${diffDays}天后)`;
+                displayText += ` (${diffDays}天后)`;
             } else if (diffDays < 0) {
-                formattedDate += ' (已过期)';
+                displayText += ' (已过期)';
             }
             
-            return formattedDate;
+            return {
+                displayText: displayText,
+                fullDate: `${year}/${month}/${day} (全天)`
+            };
         } else {
             // 非全天任务显示日期和时间
-            let formattedDate = date.toLocaleString('zh-CN', {
+            let displayText = date.toLocaleString('zh-CN', {
                 month: '2-digit',
                 day: '2-digit',
                 hour: '2-digit',
@@ -485,22 +711,28 @@ function formatDeadline(deadline) {
                 const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
                 if (diffHours === 0) {
                     const diffMinutes = Math.floor(diffTime / (1000 * 60));
-                    formattedDate += ` (${diffMinutes}分钟后)`;
+                    displayText += ` (${diffMinutes}分钟后)`;
                 } else {
-                    formattedDate += ` (${diffHours}小时后)`;
+                    displayText += ` (${diffHours}小时后)`;
                 }
             } else if (diffDays === 1) {
-                formattedDate += ' (明天)';
+                displayText += ' (明天)';
             } else if (diffDays > 1 && diffDays <= 7) {
-                formattedDate += ` (${diffDays}天后)`;
+                displayText += ` (${diffDays}天后)`;
             } else if (diffDays < 0) {
-                formattedDate += ' (已过期)';
+                displayText += ' (已过期)';
             }
             
-            return formattedDate;
+            return {
+                displayText: displayText,
+                fullDate: fullDate
+            };
         }
     } catch {
-        return deadline;
+        return {
+            displayText: deadline,
+            fullDate: deadline
+        };
     }
 }
 

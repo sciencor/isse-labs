@@ -420,4 +420,59 @@ h2 {
         justify-content: flex-end;
         margin-top: 10px;
     }
+    
+    /* 响应式标题栏 */
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .section-header h2 {
+        margin-bottom: 10px;
+    }
+}
+
+/* 任务列表标题栏样式 */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+}
+
+.section-header h2 {
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-size: 22px;
+    color: #2c3e50;
+}
+
+/* 清除所有任务按钮样式 */
+.clear-all-button {
+    padding: 8px 16px;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.clear-all-button:hover {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.clear-all-button:disabled {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    cursor: not-allowed;
+    opacity: 0.6;
 }

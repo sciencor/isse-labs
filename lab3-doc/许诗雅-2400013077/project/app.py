@@ -371,6 +371,26 @@ def delete_task(task_id):
             "message": f"删除任务失败: {str(e)}"
         }), 500
 
+# 清除所有任务
+@app.route('/tasks/clear', methods=['DELETE'])
+def clear_all_tasks():
+    """清除所有任务"""
+    try:
+        # 保存空任务列表，相当于清除所有任务
+        save_tasks([])
+        
+        return jsonify({
+            "status": "success",
+            "data": [],
+            "message": "所有任务已清除"
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "data": None,
+            "message": f"清除任务失败: {str(e)}"
+        }), 500
+
 # 启用 CORS
 @app.after_request
 def after_request(response):
