@@ -37,49 +37,115 @@ h2 {
 
 /* 输入区样式 */
 .input-section {
-    background: white;
+    background-color: #fff;
     padding: 20px;
     border-radius: 8px;
-    margin-bottom: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
 .input-group {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: flex-end;
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
 }
 
-.input-group input[type="text"] {
-    flex: 1;
-    min-width: 200px;
+.input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.input-row input, .input-row select {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 16px;
 }
 
-.input-group select, .input-group input[type="datetime-local"] {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
+.input-row input[type="text"] {
+    flex: 2;
+    min-width: 200px;
 }
 
-.input-group button {
+.input-row select {
+    flex: 1;
+    min-width: 100px;
+}
+
+.deadline-section {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.date-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.date-input-group input[type="datetime-local"] {
+    flex: 1;
+    min-width: 180px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.no-deadline-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 15px;
+    background-color: #f5f5f5;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.no-deadline-group:hover {
+    background-color: #eeeeee;
+}
+
+.date-input-group label,
+.no-deadline-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.date-input-group label input[type="checkbox"],
+.no-deadline-group label input[type="checkbox"] {
+    margin: 0;
+}
+
+.add-task-btn {
     padding: 10px 20px;
-    background-color: #3498db;
+    background-color: #4caf50;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
+    align-self: flex-end;
 }
 
-.input-group button:hover {
-    background-color: #2980b9;
+.add-task-btn:hover {
+    background-color: #45a049;
 }
 
 /* 搜索区样式 */

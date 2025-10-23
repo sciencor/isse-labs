@@ -91,7 +91,23 @@ async function loadTasks(filters = {}) {
         const data = await response.json();
         
         if (data.status === 'success') {
-            renderTasks(data.data);
+            // 前端额外状态过滤（与后端逻辑保持一致）
+            let filteredTasks = data.data;
+            if (filters.status) {
+                filteredTasks = filteredTasks.filter(task => {
+                    if (filters.status === 'completed') {
+                        return task.completed === true;
+                    } else if (filters.status === 'pending') {
+                        // 未完成且未截止的任务
+                        return task.completed !== true && !isTaskOverdue(task.deadline);
+                    } else if (filters.status === 'overdue') {
+                        // 未完成且已截止的任务
+                        return task.completed !== true && isTaskOverdue(task.deadline);
+                    }
+                    return true;
+                });
+            }
+            renderTasks(filteredTasks);
         } else {
             console.error('加载任务失败:', data.message);
             showMessage('加载任务失败', 'error');
@@ -260,8 +276,14 @@ async function addTask() {
         if (data.status === 'success') {
             // 清空输入框
             taskTitleInput.value = '';
-            // 重新加载任务列表
-            loadTasks();
+            // 重新加载任务列表，但保持当前的筛选和排序状态
+            loadTasks({
+                category: filterCategorySelect.value,
+                priority: filterPrioritySelect.value,
+                status: filterStatusSelect.value,
+                sort: sortOptionSelect.value,
+                search: searchInput.value.trim()
+            });
             showMessage('任务添加成功', 'success');
         } else {
             showMessage(data.message || '添加任务失败', 'error');
