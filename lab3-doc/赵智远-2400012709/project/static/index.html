@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo List - Modern & Minimal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header class="header-section">
+        <h1 class="app-title">ToDo List</h1>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Input Section -->
+        <section class="input-section">
+            <div class="input-toolbar">
+                <input type="text" id="taskInput" class="task-input" placeholder="Enter a new task..." maxlength="200">
+
+                <select id="prioritySelect" class="priority-select">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                </select>
+
+                <input type="datetime-local" id="dueDateInput" class="date-input">
+
+                <button id="addTaskBtn" class="add-btn">
+                    <span class="btn-icon">+</span>
+                    Add Task
+                </button>
+            </div>
+        </section>
+
+        <!-- Todo Display Section -->
+        <section class="todo-section">
+            <div class="todo-container">
+                <!-- Tab Buttons -->
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="pending">
+                        <span class="tab-icon">📋</span>
+                        Pending Tasks
+                        <span class="task-count" id="pendingCount">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="completed">
+                        <span class="tab-icon">✓</span>
+                        Completed Tasks
+                        <span class="task-count" id="completedCount">0</span>
+                    </button>
+                </div>
+
+                <!-- Todo Lists -->
+                <div class="todo-content">
+                    <!-- Pending Tasks -->
+                    <div id="pendingList" class="todo-list active">
+                        <div class="empty-state" id="emptyPending">
+                            <div class="empty-icon">📝</div>
+                            <p>No pending tasks</p>
+                            <small>Add a new task to get started!</small>
+                        </div>
+                    </div>
+
+                    <!-- Completed Tasks -->
+                    <div id="completedList" class="todo-list">
+                        <div class="empty-state" id="emptyCompleted">
+                            <div class="empty-icon">🎉</div>
+                            <p>No completed tasks yet</p>
+                            <small>Complete a task to see it here!</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>by PKU Zhao Zhiyuan</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
