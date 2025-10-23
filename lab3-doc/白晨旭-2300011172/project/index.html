@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ToDoList · Lab3</title>
+  <!-- 纯静态：引用本目录样式与脚本 -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">✅</span>
+      <h1 class="title">ToDoList · Lab3</h1>
+    </div>
+
+    <!-- 新增待办输入行 -->
+    <form class="add-form" id="addForm" autocomplete="off">
+      <label class="visually-hidden" for="titleInput">标题</label>
+      <input id="titleInput" name="title" type="text" placeholder="待办事项标题…" required />
+
+      <label class="visually-hidden" for="categoryInput">分类</label>
+      <input id="categoryInput" name="category" type="text" placeholder="分类（可空）" />
+
+      <label class="visually-hidden" for="priorityInput">优先级</label>
+      <select id="priorityInput" name="priority" title="优先级">
+        <option value="high">高</option>
+        <option value="medium" selected>中</option>
+        <option value="low">低</option>
+      </select>
+
+      <label class="visually-hidden" for="dueDateInput">截止日期</label>
+      <input id="dueDateInput" name="due_date" type="datetime-local" title="截止日期（可选）" />
+
+      <button id="addBtn" type="button" class="primary">添加</button>
+    </form>
+
+    <!-- 连接状态：后端未启动时提示 -->
+    <div class="connection">
+      <span>后端连接：</span>
+      <strong id="connStatus" class="status-off">未连接</strong>
+    </div>
+  </header>
+
+  <main>
+    <!-- 过滤区 -->
+    <section class="filters" aria-label="筛选与搜索">
+      <label class="visually-hidden" for="searchInput">搜索</label>
+      <input id="searchInput" type="search" placeholder="搜索标题或分类…" />
+
+      <label class="visually-hidden" for="categorySelect">分类</label>
+      <select id="categorySelect" title="分类筛选">
+        <option value="">全部分类</option>
+        <!-- script.js 可在运行时动态补充常见分类 -->
+      </select>
+
+      <label class="visually-hidden" for="prioritySelect">优先级</label>
+      <select id="prioritySelect" title="优先级筛选">
+        <option value="">全部优先级</option>
+        <option value="high">高</option>
+        <option value="medium">中</option>
+        <option value="low">低</option>
+      </select>
+
+      <label class="visually-hidden" for="statusSelect">完成状态</label>
+      <select id="statusSelect" title="完成状态">
+        <option value="all" selected>全部</option>
+        <option value="active">未完成</option>
+        <option value="completed">已完成</option>
+      </select>
+
+      <!-- 预留按钮（若脚本需要） -->
+      <button id="applyBtn" type="button">应用筛选</button>
+      <button id="clearBtn" type="button" class="secondary">清空筛选</button>
+    </section>
+
+    <!-- 列表区 -->
+    <section class="list-section" aria-label="待办列表">
+      <ul id="list" class="todo-list">
+        <!-- 初始占位：后端未连或数据为空时 -->
+        <li class="empty">
+          <div>尚无待办或后端未连接。</div>
+          <div class="hint">请先启动后端（Flask 运行在 localhost:5000），或点击上方“添加”创建一条本地记录。</div>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer" aria-label="统计信息">
+    <div class="stats">
+      <span>总数：<strong id="totalCount">0</strong></span>
+      <span>已完成：<strong id="completedCount">0</strong></span>
+      <span>未完成：<strong id="activeCount">0</strong></span>
+    </div>
+  </footer>
+
+  <!-- 供无样式访问时可读性更好 -->
+  <style>
+    /* 仅放无障碍辅助类；主要样式请在 style.css 中 */
+    .visually-hidden {
+      position: absolute !important;
+      height: 1px; width: 1px;
+      overflow: hidden; clip: rect(1px, 1px, 1px, 1px);
+      white-space: nowrap; border: 0; padding: 0; margin: -1px;
+    }
+  </style>
+
+  <!-- 不加入任何第三方库；仅引用本地脚本 -->
+  <script src="./script.js" defer></script>
+</body>
+</html>
