@@ -1,0 +1,533 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 全天模式样式 - 时间选择部分显示为只读效果 */
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-ampm-field,
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-hour-field,
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-minute-field,
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-second-field,
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-millisecond-field,
+input[type="datetime-local"].all-day-mode::-webkit-datetime-edit-meridiem-field {
+    background-color: #f0f0f0;
+    color: #999;
+    position: relative;
+}
+
+/* 为Firefox和其他浏览器提供回退样式 */
+input[type="datetime-local"].all-day-mode {
+    background-color: #fcfcfc;
+    border: 1px solid #ddd;
+}
+
+body {
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1, h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 28px;
+    padding: 20px 0;
+}
+
+/* 现代化标题设计 */
+.title-design {
+    font-size: 4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e40af, #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 6px rgba(30, 64, 175, 0.3);
+    letter-spacing: -1px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 2rem 0 4rem 0;
+    position: relative;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.title-design::after {
+    content: '';
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30%;
+    height: 4px;
+    background: linear-gradient(90deg, #1e40af, #38bdf8);
+    border-radius: 2px;
+}
+
+h2 {
+    font-size: 22px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+/* 输入区样式 */
+.input-section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 第一行：任务标题和添加按钮 */
+.input-row-first {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.input-row-first input[type="text"] {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* 第二行：分类、优先级和设置截止时间按钮 */
+.input-row-second {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+/* 紧凑排列的下拉菜单组 */
+.dropdowns-group {
+    display: flex;
+    gap: 8px;
+}
+
+.dropdowns-group select {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+    min-width: 100px;
+}
+
+/* 设置截止时间按钮 */
+.set-deadline-btn {
+    padding: 10px 16px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.set-deadline-btn:hover {
+    background-color: #2563eb;
+}
+
+/* 截止时间选择器 */
+.deadline-section {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #f8fafc;
+    border-radius: 4px;
+    border-left: 4px solid #3b82f6;
+    width: 100%;
+}
+
+.date-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-input-group input[type="datetime-local"] {
+    flex: 1;
+    min-width: 180px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.date-input-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.date-input-group label input[type="checkbox"] {
+    margin: 0;
+}
+
+.add-task-btn {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    align-self: flex-end;
+}
+
+.add-task-btn:hover {
+    background-color: #45a049;
+}
+
+/* 搜索区样式 */
+.search-section {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-group {
+    display: flex;
+    gap: 10px;
+}
+
+.search-group input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.search-group button {
+    padding: 10px 20px;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.search-group button:hover {
+    background-color: #27ae60;
+}
+
+/* 筛选区样式 */
+.filter-section {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-group select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 120px;
+}
+
+.filter-group button {
+    padding: 8px 15px;
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.filter-group button:hover {
+    background-color: #7f8c8d;
+}
+
+/* 任务展示区样式 */
+.tasks-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tasks-container {
+    margin-top: 20px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background: #fff;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.task-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* 任务标题 */
+.task-title {
+    flex: 1;
+    font-size: 16px;
+    margin-right: 15px;
+}
+
+/* 任务元信息 */
+.task-meta {
+    display: flex;
+    gap: 15px;
+    margin-right: 15px;
+    font-size: 14px;
+    color: #666;
+}
+
+.task-category, .task-priority, .task-deadline {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    background-color: #f0f0f0;
+}
+
+/* 优先级样式 */
+.priority-high {
+    background-color: #ffecec !important;
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+.priority-medium {
+    background-color: #fff5e6 !important;
+    color: #f39c12 !important;
+}
+
+.priority-low {
+    background-color: #e6f7ff !important;
+    color: #3498db !important;
+}
+
+/* 即将截止样式 */
+.deadline-soon {
+    background-color: #fff3cd !important;
+    color: #856404 !important;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* 任务状态 */
+.task-status {
+    margin-right: 15px;
+    font-size: 14px;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.status-completed {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-pending {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.status-overdue {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* 任务操作按钮 */
+.task-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.task-actions button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.complete-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.complete-btn:hover {
+    background-color: #218838;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+/* 已完成任务样式 */
+.task-completed .task-title {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+/* 已截止任务样式 */
+.task-overdue {
+    border-color: #dc3545;
+    background-color: #fdf2f2;
+    animation: border-flicker 2s infinite;
+}
+
+@keyframes border-flicker {
+    0%, 100% { border-color: #dc3545; }
+    50% { border-color: #ff9999; }
+}
+
+.task-overdue .task-title {
+    color: #dc3545;
+}
+
+/* 无任务提示 */
+.no-tasks {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 16px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .input-group, .search-group, .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .input-group input, .input-group select, .input-group button,
+    .search-group input, .search-group button,
+    .filter-group select, .filter-group button {
+        width: 100%;
+    }
+    
+    .task-item {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: left;
+    }
+    
+    .task-meta {
+        flex-wrap: wrap;
+        margin: 10px 0;
+    }
+    
+    .task-actions {
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+    
+    /* 响应式标题栏 */
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .section-header h2 {
+        margin-bottom: 10px;
+    }
+}
+
+/* 任务列表标题栏样式 */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+}
+
+.section-header h2 {
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-size: 22px;
+    color: #2c3e50;
+}
+
+/* 清除所有任务按钮样式 */
+.clear-all-button {
+    padding: 8px 16px;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.clear-all-button:hover {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.clear-all-button:disabled {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
