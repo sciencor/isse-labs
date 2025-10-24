@@ -1,0 +1,294 @@
+/* 全局：莫兰迪风格配色 + 更大更粗的字体 */
+:root{
+    /* Morandi-like muted palette (light) */
+    --bg: #e9e6e3;       /* 背景 */
+    --card: #ffffff;     /* 卡片 */
+    --text: #282b2f;     /* 主要文字 */
+    --muted: #6b8291;    /* 次要文字 */
+    --accent: #2588c2;   /* 按钮等强调色 */
+    --danger: #c54f4f;
+    --card-shadow: rgba(40, 40, 47, 0.06);
+    --select-bg: #f3f4f6; /* 下拉背景：白天淡灰 */
+}
+
+[data-theme="dark"]{
+    /* Morandi-like dark variant (调整为暖黄文本以满足需求) */
+    --bg: #000000;            /* 更深的背景，避免白线透出 */
+    --card: #070f19;
+    --text: #ffffff;         /* 主要文字 */
+    --muted: #aec9dc;        /* 次要文字 */
+    --accent: #7b8ea1;
+    --danger: #ff6b6b;
+    --card-shadow: rgba(0,0,0,0.6);
+    --select-bg: #1b1c1e; /* 下拉背景：夜间深灰 */
+}
+
+/* 确保 html 也使用背景色（修复顶部白线） */
+html {
+    background-color: var(--bg);
+    margin: 0;
+}
+
+/* 统一字体：使用常见中文无衬线作为首选，确保“年/月/日”等字符与其他文字一致 */
+html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft Yahei", "Noto Sans SC", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px;       /* 更大字体 */
+    font-weight: 600;      /* 更粗 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.45;
+    background-attachment: fixed; /* 防止滚动时出现不同背景接缝 */
+}
+
+/* 容器与布局 */
+.app{ max-width: 980px; margin: 24px auto; padding: 16px; }
+header{ display:flex; gap:12px; align-items:center; margin-bottom:12px; }
+.theme-toggle{ margin-left:auto; }
+
+.card{
+    background: var(--card);
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 8px 22px var(--card-shadow);
+}
+
+/* 表单与控件 */
+.input-row{ display:flex; gap:10px; align-items:center; }
+
+/* 只针对文本和日期输入，不再包含 select */
+input[type="text"], input[type="datetime-local"]{
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid rgba(47,43,40,0.08);
+    min-width:160px;
+    font-size: 16px;
+    font-weight: 600;
+    background: var(--card); /* 显式使用卡片背景，避免系统白色 */
+    color: var(--text);
+    font-family: inherit;      /* 确保输入使用相同字体 */
+    -webkit-font-smoothing: antialiased;
+    /* 保持原生输入外观以避免兼容问题 */
+}
+
+/* 规范并恢复下拉框的原生外观与可见性，添加圆角与最小高度 */
+select {
+    -webkit-appearance: menulist-button;
+    appearance: menulist-button;
+    border-radius: 10px;
+    padding:10px 12px;
+    border:1px solid rgba(47,43,40,0.12);
+    min-width:160px;
+    min-height:44px;
+    line-height:1.2;
+    background-color: var(--select-bg); /* 使用区分背景 */
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    box-sizing: border-box;
+}
+
+/* 尽量设置 option 背景/文字颜色（多数浏览器有效） */
+option {
+    background-color: var(--select-bg);
+    color: var(--text);
+}
+
+/* 针对深色主题：确保 select 下拉与页面同色并可见（边框、文字） */
+[data-theme="dark"] select,
+[data-theme="dark"] option {
+    background-color: var(--select-bg);
+    color: var(--text);
+    border:1px solid rgba(255,255,255,0.06);
+}
+
+/* 隐藏原生 select（保留在 DOM 中以便脚本/表单使用） */
+.hidden-select {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+}
+
+/* 自定义下拉组件样式 */
+.custom-select { position: relative; display: inline-block; vertical-align: middle; margin-left:6px; }
+.custom-select__trigger{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:10px 12px;
+    min-width:160px;
+    border-radius:10px;
+    border:1px solid rgba(47,43,40,0.12);
+    background: var(--select-bg);
+    color: var(--text);
+    font-family: inherit;
+    font-size:16px;
+    font-weight:600;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+.custom-select__trigger .label { flex:1; text-align:left; }
+.custom-select__trigger .arrow {
+    width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid rgba(0,0,0,0.35);
+    transform-origin:center;
+}
+
+/* options list */
+.custom-options{
+    position:absolute;
+    top: calc(100% + 8px);
+    left:0;
+    right:0;
+    background: var(--card);
+    border-radius:8px;
+    box-shadow: 0 8px 22px var(--card-shadow);
+    max-height:260px;
+    overflow:auto;
+    z-index:1200;
+    display:none;
+}
+
+/* show when open */
+.custom-select.open .custom-options{ display:block; }
+.custom-select.open .custom-select__trigger .arrow{ transform: rotate(180deg); }
+
+/* option item */
+.custom-option{
+    padding:10px 12px;
+    cursor:pointer;
+    color: var(--text);
+    font-family: inherit;
+    font-weight:600;
+    white-space:nowrap;
+}
+.custom-option:hover{ 
+    background: rgba(0,0,0,0.04); /* light hover */
+}
+.custom-option.selected{ font-weight:800; }
+
+/* disabled option visual */
+.custom-option.disabled{ opacity:0.5; pointer-events:none; }
+
+/* 小屏幕适配 */
+@media (max-width:700px){
+    header{ flex-direction:column; align-items:stretch }
+    .input-row{ flex-direction:column; align-items:stretch }
+    .custom-select__trigger, select { min-width: auto; width:100%; }
+    .custom-select{ display:block; margin-left:0; }
+}
+
+/* 深色主题覆盖（确保在夜间模式下可读） */
+[data-theme="dark"] .custom-select__trigger{
+    background: var(--card);
+    color: var(--text);
+    border:1px solid rgba(255,255,255,0.06);
+}
+[data-theme="dark"] .custom-options{
+    background: var(--card);
+}
+[data-theme="dark"] .custom-option:hover{ background: rgba(255,255,255,0.03); }
+
+/* 控件、任务列表 */
+main{ margin-top:12px; display:flex; flex-direction:column; gap:12px; }
+.controls{ display:flex; gap:10px; align-items:center; }
+.tasks{ display:flex; flex-direction:column; gap:10px; }
+.task{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid rgba(47,43,40,0.04);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+}
+.task .meta{ flex:1; display:flex; flex-direction:column; }
+.task .title{ font-weight:800; font-size:20px; color:var(--text); }
+.muted{
+    color:var(--muted);
+    font-size:15px;
+    font-weight:600; /* 与整体一致的粗细，确保年月日字体一致 */
+    font-family: inherit; /* 关键：日期文本也使用同一字体 */
+}
+
+/* 状态与操作按钮 */
+.status{ display:flex; gap:8px; align-items:center; }
+.actions{ display:flex; gap:8px; }
+.star{ color: #c9a84b; font-size:18px; margin-right:6px; }
+.flag{ color: var(--danger); font-size:18px; margin-right:6px; }
+.completed{ color:var(--muted); text-decoration:line-through; opacity:0.85; }
+.unfinished{ color:#6b6f73; background:transparent; }
+
+/* Footer 过滤等 */
+footer{ margin-top:12px; display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.filters{ display:flex; gap:8px; align-items:center; }
+
+/* 响应式 */
+@media (max-width:700px){
+    header{ flex-direction:column; align-items:stretch }
+    .input-row{ flex-direction:column; align-items:stretch }
+}
+
+/* 按钮样式：恢复明显的圆角/强调色（使 添加/取消完成/刷新 等按钮正常渲染） */
+button{
+    background: var(--accent);
+    color: #fff;
+    padding:8px 12px;
+    border-radius:6px;
+    border:0;
+    cursor:pointer;
+    font-weight:700;
+    font-size:15px;
+}
+button.ghost{
+    background:transparent;
+    color:var(--accent);
+    border:1px solid rgba(47,43,40,0.06);
+    padding:8px 12px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+/* 删除按钮保持显眼（保留行内样式也会生效） */
+button[style*="background:#ff4d4f"], .danger {
+    background: var(--danger) !important;
+    color: #fff !important;
+}
+
+/* 确保 time / mut ed 文本都继承字体 */
+time, .muted, .task { font-family: inherit; }
+
+/* 强制 datetime-local 内部编辑区域使用相同字体（修复仅日期为宋体的问题，针对 WebKit） */
+input[type="datetime-local"]::-webkit-datetime-edit,
+input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper,
+input[type="datetime-local"]::-webkit-datetime-edit-year-field,
+input[type="datetime-local"]::-webkit-datetime-edit-month-field,
+input[type="datetime-local"]::-webkit-datetime-edit-day-field,
+input[type="datetime-local"]::-webkit-datetime-edit-hour-field,
+input[type="datetime-local"]::-webkit-datetime-edit-minute-field {
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    color: inherit;
+}
+
+/* Firefox (部分版本) 的替代：使用通用选择器确保字体继承 */
+input[type="datetime-local"] * {
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    color: inherit !important;
+}
+
+/* Chrome / WebKit 滚动条：使轨道与页面背景一致，避免出现白色缝隙 */
+::-webkit-scrollbar { width: 12px; height:12px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 8px; border: 3px solid var(--bg); }
