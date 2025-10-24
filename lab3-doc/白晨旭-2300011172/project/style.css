@@ -1,0 +1,335 @@
+/* =============================
+   基础配色与暗/明主题变量
+   ============================= */
+:root{
+  --bg: #f7f9fc;
+  --bg-elev: #ffffff;
+  --text: #0b1220;
+  --muted: #5b6475;
+  --border: #e3e8f0;
+  --accent: #2563eb;
+
+  --card: #ffffff;
+  --shadow: 0 6px 18px rgba(0,0,0,0.08);
+
+  /* 优先级点颜色（明亮主题） */
+  --prio-high: #c2410c;   /* brick orange */
+  --prio-med:  #334155;   /* slate */
+  --prio-low:  #0f766e;   /* teal */
+
+  --badge-bg: #eef2f7;
+  --badge-tx: #1f2937;
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #0b0d12;
+    --bg-elev: #0f1524;
+    --text: #e7ebf3;
+    --muted: #9aa4b2;
+    --border: #253045;
+    --accent: #60a5fa;
+
+    --card: #0f1524;
+    --shadow: 0 10px 30px rgba(0,0,0,0.32);
+
+    /* 优先级点颜色（暗色主题） */
+    --prio-high: #f97316;
+    --prio-med:  #94a3b8;
+    --prio-low:  #14b8a6;
+
+    --badge-bg: #1f2937;
+    --badge-tx: #e5e7eb;
+  }
+}
+
+/* =============================
+   全局排版
+   ============================= */
+* { box-sizing: border-box; }
+html, body {
+  height: 100%;
+}
+body{
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* 基本容器与语义区块 */
+.site-header, .site-footer { 
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.site-footer {
+  border-top: 1px solid var(--border);
+  border-bottom: none;
+}
+main{
+  padding: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* 顶部品牌与表单布局 */
+.site-header{
+  max-width: 960px;
+  margin: 0 auto;
+}
+.brand{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.brand .logo{ font-size: 22px; }
+.brand .title{ font-size: 20px; margin: 0; }
+
+/* 连接状态 */
+.connection{
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.status-on{ color: #22c55e; }
+.status-off{ color: #ef4444; }
+
+/* =============================
+   表单与过滤区布局（网格）
+   ============================= */
+/* 关键：为移动端留出换行空间，桌面端排列在一行 */
+.add-form, .filters{
+  display: grid;
+  grid-template-columns: 1.2fr 1fr auto auto auto;
+  gap: 8px;
+}
+.add-form{
+  margin-top: 8px;
+}
+.add-form input, .add-form select,
+.filters input, .filters select{
+  padding: 10px 12px;
+  background: var(--bg-elev);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+}
+.add-form button, .filters button{
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+.filters{
+  margin: 16px 0;
+}
+button.secondary{
+  background: #64748b;
+}
+
+/* =============================
+   列表卡片
+   ============================= */
+.todo-list{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+.todo{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 0 0 rgba(0,0,0,0);   /* 初始无阴影 */
+  transition: box-shadow .15s ease, transform .15s ease, opacity .2s ease;
+}
+.todo:hover{
+  box-shadow: var(--shadow);         /* 轻微阴影 */
+  transform: translateY(-1px);
+}
+.row{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.title{
+  font-weight: 600;
+  line-height: 1.35;
+}
+/* 完成态：灰度 & 删除线 */
+.todo.done{
+  opacity: .7;
+  filter: grayscale(.2);
+}
+.todo.done .title{
+  text-decoration: line-through;
+}
+
+/* 元信息与操作区 */
+.meta{
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ops{
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+.ops .del{
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.ops .del:hover{
+  background: var(--badge-bg);
+}
+
+/* =============================
+   徽章与优先级圆点
+   ============================= */
+.badge{
+  font-size: 12px;
+  padding: 2px 10px 2px 18px; /* 左侧预留圆点 */
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--badge-tx);
+  position: relative;
+}
+/* 纯 CSS 小圆点 */
+.badge::before{
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: var(--muted);
+}
+.badge.high::before{ background: var(--prio-high); }
+.badge.medium::before{ background: var(--prio-med); }
+.badge.low::before{ background: var(--prio-low); }
+
+/* 截止日期徽章可与优先级区分 */
+.badge.due{
+  opacity: .9;
+}
+
+/* 空态 */
+.empty{
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+}
+.empty .hint{
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+/* =============================
+   统计信息
+   ============================= */
+.site-footer .stats{
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  color: var(--muted);
+}
+.site-footer .stats strong{
+  color: var(--text);
+}
+
+/* =============================
+   行内编辑输入框
+   ============================= */
+.inline-editor{
+  padding: 6px 8px;
+  width: 100%;
+  background: var(--bg-elev);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+}
+
+/* =============================
+   Toast / Alert 样式
+   （脚本可将容器放在固定位置，将单条提示加 .toast）
+   ============================= */
+.toast{
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #7f1d1d;     /* error 红棕 */
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  font-size: 14px;
+}
+.toast.info{ background: #1f2937; }  /* 信息提示样式 */
+
+/* =============================
+   响应式：移动端 < 480px
+   - 列表单列
+   - 表单换行（2 列或 1 列）
+   ============================= */
+@media (max-width: 480px){
+  .add-form{
+    grid-template-columns: 1fr 1fr;
+  }
+  .add-form #titleInput{
+    grid-column: 1 / -1; /* 标题独占一行 */
+  }
+  .add-form #categoryInput{
+    grid-column: 1 / 2;
+  }
+  .add-form #priorityInput{
+    grid-column: 2 / 3;
+  }
+  .add-form #dueDateInput{
+    grid-column: 1 / 2;
+  }
+  .add-form #addBtn{
+    grid-column: 2 / 3;
+  }
+
+  .filters{
+    grid-template-columns: 1fr 1fr;
+  }
+  .filters #searchInput{
+    grid-column: 1 / -1;  /* 搜索独占一行 */
+  }
+}
+
+/* =============================
+   细节：焦点与可点击元素状态
+   ============================= */
+input[type="text"]:focus,
+input[type="search"]:focus,
+input[type="datetime-local"]:focus,
+select:focus{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+button.primary{
+  background: var(--accent);
+}
+button.primary:hover{
+  filter: brightness(1.05);
+}
+button:active{
+  transform: translateY(0.5px);
+}

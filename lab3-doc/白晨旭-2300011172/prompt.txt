@@ -1,0 +1,107 @@
+【Lab3 · ToDoList · AI 协作过程 prompt.txt】
+
+一、阶段化指令摘要（我给 AI 的关键指令）
+--------------------------------------
+A. 规划阶段（Project Scaffolding）
+- 目标：最小可运行的 ToDoList 前后端小项目。
+- 约束：后端 Flask（localhost:5000，返回 JSON，支持 CORS），前端纯 HTML + 原生 JS + fetch。
+- 功能：添加、删除、标记完成、按优先级与分类展示，支持搜索/过滤与截止日期。
+- 持久化：本地 data.json 文件（file-based storage）。
+- 目录：lab3-doc/李华-学号/{prompt.txt, screenshot.png, README.md, project/...}。
+
+B. 后端阶段（Flask API）
+- 生成完整 app.py（Flask 2.x 兼容），包含路由：
+  GET /api/todos（q/category/priority/completed）
+  POST /api/todos（title*, priority ∈ {low,medium,high}, category, due_date?）
+  PATCH /api/todos/<id>（允许 title|priority|category|completed|due_date）
+  DELETE /api/todos/<id>
+- 统一返回格式：{"ok": true, "data": ...} 或 {"ok": false, "error": "msg"}，对 400/404 友好报错。
+- 存储：读写 project/data.json；启动时自动创建；并发写入串行化。
+- CORS：flask_cors；运行入口：app.run(host="127.0.0.1", port=5000, debug=True)。
+- 给出 requirements.txt（最小集合）。
+
+C. 测试阶段（无前端自测）
+- 需要一份 Bash 版 curl 自测脚本（新增/查询/过滤/更新/删除/错误用例）。
+- 需要一份 PowerShell 版 curl 自测脚本（处理 Windows 引号与编码问题，UTF-8、--data-binary 临时文件、错误场景 try/catch）。
+
+D. 前端阶段（HTML 结构）
+- 生成 project/index.html：纯静态、语义化 header/main/section/footer。
+- 顶部新增区：标题/分类/优先级/截止日期 + “添加”按钮；显示“后端连接状态”。
+- 中部过滤区：搜索、分类下拉、优先级下拉、完成状态切换（all/active/completed）。
+- 列表区：展示复选框（完成）、标题（支持双击行内编辑）、分类、优先级、截止日期、删除按钮。
+- 底部统计：总数/已完成/未完成。
+- 后端未启动时显示“未连接”占位，不报错。
+
+E. 行为脚本阶段（JS 交互）
+- 生成 project/script.js，固定 BASE_URL = http://localhost:5000。
+- API 封装：listTodos(params), createTodo(payload), updateTodo(id, patch), deleteTodo(id)。
+- 初始加载：拉取/渲染；排序（high>medium>low）与统计；动态填充分类下拉。
+- 交互：添加（POST→清空→刷新）；过滤（输入/切换即触发 GET）；勾选完成（PATCH）；删除（DELETE）；双击标题行内编辑（Enter 保存 PATCH，Esc/blur 取消）。
+- 错误处理：顶部 toast/alert（3s 自动消失）。
+- 轻量状态：内存缓存 todos + filters，尽量局部刷新；后端断连进入“离线空态”。
+
+F. 样式阶段（CSS）
+- 生成 project/style.css：暗/明主题变量；列表 hover 轻阴影；完成项灰度+删除线；优先级圆点（纯 CSS）；移动端 <480px 表单换行与单列列表；.toast 样式；注释说明布局。
+
+G. 打包与说明（README）
+- 生成 README.md（中文）：简介、目录结构、环境准备与运行步骤（venv、pip install、python app.py、打开 index.html）、接口例子与常见问题（CORS、5000 端口占用、Windows 文件锁）。
+
+二、关键实现决策（AI 提供并落地的方案）
+--------------------------------------
+1) 数据结构（后端与前端一致）
+{
+  "id": "uuid",
+  "title": "str",
+  "priority": "low|medium|high",
+  "category": "str",
+  "completed": false,
+  "created_at": "ISO",
+  "due_date": "ISO|null"
+}
+- created_at 由后端在创建时写入；due_date 为 ISO8601 字符串或 null。
+
+2) 错误与统一返回格式
+- 成功：{"ok": true, "data": ...}
+- 失败：{"ok": false, "error": "message"}，配合合适 HTTP 状态码（400/404），前端 toast 展示。
+
+3) 排序策略（前端渲染）
+- PRIO_ORDER: high(0) < medium(1) < low(2)，优先按优先级，其次按 created_at 逆序显示。
+
+4) 文件存储策略（data.json）
+- 启动自动创建空数组 []。
+- 串行“读-改-写”：进程内 threading.Lock 保证原子性。
+- 原子写入：先写临时文件，再 os.replace 覆盖，降低损坏风险。
+
+5) 过滤与搜索
+- 服务端 GET /api/todos 支持 q（标题/分类模糊匹配、大小写不敏感）、category（完全匹配）、priority、completed（true/false/1/0）。
+- 前端保持 filters 内存副本；已连接优先调用服务端过滤；断连时使用内存过滤避免白屏。
+
+6) CORS 与端口
+- 后端启用 flask_cors，允许从本地静态页访问。
+- 统一在 localhost:5000 提供 API。若端口变更需同步修改 script.js 的 BASE_URL。
+
+7) 兼容性与健壮性
+- Flask 2.x API 兼容；JSON 校验（title 非空、priority 合法、due_date ISO8601 合法）。
+- PowerShell 自测脚本：UTF-8 + 临时文件 + --data-binary，规避 Windows 下单引号/UTF-16 管道问题。
+- 前端即使后端未启动，也会显示“未连接”占位；页面无报错。
+
+三、与课程要求对齐的点
+----------------------
+- 技术栈：后端 Flask（JSON + CORS），前端纯 HTML/CSS/原生 JS + fetch（无第三方库）。
+- 端口：后端运行在 localhost:5000（脚本与前端 BASE_URL 固定为该端口）。
+- 功能覆盖：新增、删除、标记完成；按优先级/分类展示；搜索/过滤；截止日期；统计信息。
+- 持久化：本地 data.json（非数据库，file-based，线程锁 + 原子写入）。
+- 目录结构：符合 lab3-doc/姓名-学号/ 下含 prompt.txt、screenshot.png、README.md、project/{app.py, requirements.txt, index.html, script.js, style.css, data.json}。
+- 测试与可复现：提供 Bash 与 PowerShell 的 curl 自测清单，便于无前端验证后端接口。
+- 可运行性：后端一条命令启动；前端直接打开 index.html 即可使用；断连有提示。
+
+四、可复用提示（供后续作业/复盘）
+--------------------------------
+- 「生成最小可运行 Flask 后端，要求：统一 JSON 返回、CORS、data.json 文件持久化（线程锁 + 原子写）、四个 REST 路由、字段与合法性校验、requirements.txt、运行入口。」
+- 「生成纯静态 index.html：header/add form、filters、list（checkbox/title/category/priority/due_date/delete）、footer 统计、后端未连占位，语义化标签，不引第三方库。」
+- 「生成 script.js：BASE_URL 固定、API 封装（list/create/update/delete）、首屏加载与排序、搜索/过滤/勾选完成/删除/标题行内编辑、toast 错误处理、内存状态管理与离线空态。」
+- 「生成 style.css：明暗主题变量、卡片 hover 阴影、完成态删除线、优先级圆点（纯 CSS）、移动端 <480px 布局、.toast 样式、注释关键布局。」
+- 「生成 README.md（中文）：简介、目录、环境与运行、接口简表、常见问题（CORS/端口占用/Windows 文件锁）。」
+- 「提供 Bash/PowerShell curl 自测脚本：创建/过滤/更新/删除/错误用例，Windows 版处理 UTF-8 与 --data-binary。」
+
+（完）
