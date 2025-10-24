@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList 任务管理系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 页面标题 -->
+        <header class="header">
+            <h1 class="title">📋 TodoList 任务管理系统</h1>
+            <p class="subtitle">高效管理您的日常任务 By 2300013073沈睿弘</p>
+        </header>
+
+        <!-- 统计信息区 -->
+        <div class="statistics">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTasks">0</div>
+                <div class="stat-label">总任务</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="inProgressTasks">0</div>
+                <div class="stat-label">进行中</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">已完成</div>
+            </div>
+        </div>
+
+        <!-- 添加任务表单 -->
+        <div class="add-task-section">
+            <h2 class="section-title">✨ 添加新任务</h2>
+            <form id="addTaskForm" class="add-task-form">
+                <div class="form-row">
+                    <input 
+                        type="text" 
+                        id="taskTitle" 
+                        class="input-field task-title-input" 
+                        placeholder="请输入任务标题..." 
+                        required
+                    >
+                </div>
+                <div class="form-row form-row-inline">
+                    <div class="form-group">
+                        <label for="taskCategory">类别</label>
+                        <select id="taskCategory" class="select-field" required>
+                            <option value="学习">📚 学习</option>
+                            <option value="工作">💼 工作</option>
+                            <option value="生活">🏠 生活</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskPriority">优先级</label>
+                        <select id="taskPriority" class="select-field" required>
+                            <option value="高">🔴 高</option>
+                            <option value="中">🟡 中</option>
+                            <option value="低">🟢 低</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDueTime">截止时间</label>
+                        <input 
+                            type="datetime-local" 
+                            id="taskDueTime" 
+                            class="input-field"
+                        >
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-add">
+                    <span>➕ 添加任务</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- 筛选与搜索区 -->
+        <div class="filter-section">
+            <h2 class="section-title">🔍 筛选与搜索</h2>
+            
+            <!-- 类别筛选 -->
+            <div class="filter-group">
+                <label class="filter-label">类别筛选：</label>
+                <div class="filter-buttons" id="categoryFilter">
+                    <button class="filter-btn active" data-category="">全部</button>
+                    <button class="filter-btn" data-category="学习">📚 学习</button>
+                    <button class="filter-btn" data-category="工作">💼 工作</button>
+                    <button class="filter-btn" data-category="生活">🏠 生活</button>
+                </div>
+            </div>
+
+            <!-- 优先级筛选 -->
+            <div class="filter-group">
+                <label class="filter-label">优先级筛选：</label>
+                <div class="filter-buttons" id="priorityFilter">
+                    <button class="filter-btn active" data-priority="">全部</button>
+                    <button class="filter-btn priority-high" data-priority="高">🔴 高</button>
+                    <button class="filter-btn priority-medium" data-priority="中">🟡 中</button>
+                    <button class="filter-btn priority-low" data-priority="低">🟢 低</button>
+                </div>
+            </div>
+
+            <!-- 搜索功能 -->
+            <div class="filter-group">
+                <label class="filter-label">搜索任务：</label>
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="input-field search-input" 
+                        placeholder="输入关键词搜索任务..."
+                    >
+                    <button class="btn btn-secondary" id="searchBtn">🔍 搜索</button>
+                    <button class="btn btn-secondary" id="clearSearchBtn">✖️ 清除</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 任务列表区 -->
+        <div class="tasks-section">
+            <h2 class="section-title">📝 进行中的任务</h2>
+            <div id="tasksList" class="tasks-list">
+                <!-- 任务卡片将通过 JavaScript 动态生成 -->
+            </div>
+            <div id="noTasksMessage" class="no-tasks-message" style="display: none;">
+                <p>🎉 暂无待办任务！</p>
+            </div>
+        </div>
+
+        <!-- 已完成任务区（可折叠） -->
+        <div class="completed-section">
+            <h2 class="section-title collapsible" id="completedToggle">
+                <span>✅ 已完成的任务</span>
+                <span class="toggle-icon">▼</span>
+            </h2>
+            <div id="completedTasksList" class="tasks-list collapsed">
+                <!-- 已完成任务卡片将通过 JavaScript 动态生成 -->
+            </div>
+            <div id="noCompletedMessage" class="no-tasks-message" style="display: none;">
+                <p>还没有已完成的任务</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示消息容器 -->
+    <div id="toast" class="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
