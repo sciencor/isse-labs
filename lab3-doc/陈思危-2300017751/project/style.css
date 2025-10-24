@@ -1,0 +1,518 @@
+/* 基础样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+/* 统计信息 */
+.stats {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.stats span {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    background-color: #e9ecef;
+}
+
+#total-count {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+#pending-count {
+    background-color: #fff8e1;
+    color: #ff8f00;
+}
+
+#overdue-count {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* 表单样式 */
+.add-todo-form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.form-row:last-child {
+    margin-bottom: 0;
+}
+
+input[type="text"],
+textarea,
+select,
+.date-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus,
+.date-input:focus {
+    outline: none;
+    border-color: #4facfe;
+    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+}
+
+textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+/* 日期选择器美化 */
+.date-input {
+    max-width: 180px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+    background-color: #4facfe;
+    padding: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #4facfe;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background-color: #00f2fe;
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* 筛选区域 */
+.filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-size: 14px;
+    color: #666;
+}
+
+.filter-group select {
+    min-width: 140px;
+    padding: 8px 12px;
+}
+
+/* 任务列表容器 */
+.todos-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+#todos-list, #completed-todos {
+    list-style: none;
+}
+
+.todo-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f1f1f1;
+    transition: background-color 0.2s ease;
+}
+
+.todo-item:hover {
+    background-color: #fafafa;
+}
+
+.todo-item.completed .todo-title {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.todo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.todo-content {
+    flex: 1;
+}
+
+.todo-title {
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.todo-description {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 8px;
+    padding-left: 2px;
+}
+
+.todo-meta {
+    display: flex;
+    gap: 10px;
+    font-size: 12px;
+    flex-wrap: wrap;
+}
+
+/* 徽章样式 */
+.priority-badge,
+.category-badge,
+.deadline-badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 11px;
+}
+
+.priority-high {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.priority-medium {
+    background-color: #fff8e1;
+    color: #ff8f00;
+}
+
+.priority-low {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.category-badge {
+    background-color: #f3e5f5;
+    color: #6a1b9a;
+}
+
+.deadline-badge {
+    background-color: #e8f4fd;
+    color: #0288d1;
+}
+
+.deadline-badge.overdue {
+    background-color: #ffebee;
+    color: #c62828;
+    font-weight: 600;
+}
+
+/* 任务操作按钮 */
+.todo-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+.btn-toggle {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.btn-toggle:hover {
+    background-color: #bbdefb;
+}
+
+.btn-toggle.completed {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.btn-toggle.completed:hover {
+    background-color: #c8e6c9;
+}
+
+.btn-edit {
+    background-color: #fff8e1;
+    color: #ff8f00;
+}
+
+.btn-edit:hover {
+    background-color: #fff0c8;
+}
+
+.btn-delete {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.btn-delete:hover {
+    background-color: #ffcdd2;
+}
+
+/* 空状态 */
+.empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    color: #888;
+    font-size: 16px;
+}
+
+/* 已完成任务区域 */
+.completed-tasks-section {
+    display: none; /* 默认隐藏（无已完成任务时） */
+    border-top: 1px solid #f1f1f1;
+}
+
+.completed-indicator {
+    padding: 12px 20px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #f1f1f1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.completed-indicator:hover {
+    background-color: #f0f0f0;
+}
+
+.completed-count-badge {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.toggle-icon {
+    margin-left: auto;
+    font-size: 14px;
+    color: #666;
+}
+
+.completed-tasks-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#completed-todos .todo-item {
+    background-color: #f9f9f9;
+}
+
+#completed-todos .todo-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* 模态框样式 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f1f1f1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.close {
+    font-size: 24px;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #f1f1f1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-primary {
+    background-color: #4facfe;
+}
+
+.btn-primary:hover {
+    background-color: #00f2fe;
+}
+
+.btn-secondary {
+    background-color: #e9ecef;
+    color: #444;
+}
+
+.btn-secondary:hover {
+    background-color: #dde1e3;
+}
+
+/* 通知提示 */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    transition: all 0.3s ease;
+}
+
+.notification.error {
+    background-color: #e53935;
+}
+
+.notification.success {
+    background-color: #43a047;
+}
+
+.notification.fade-out {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .date-input {
+        max-width: 100%;
+    }
+    
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .todo-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .todo-actions {
+        justify-content: flex-end;
+    }
+}
