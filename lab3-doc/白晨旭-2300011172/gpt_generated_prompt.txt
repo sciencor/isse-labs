@@ -1,0 +1,128 @@
+# Step 0 
+
+你将帮助我完成一个最小可运行的 ToDoList 前后端小项目，用于课程作业。要求：
+
+* 后端：Flask，运行在 `localhost:5000`，接口返回 JSON，支持 CORS。
+* 前端：纯 HTML + 原生 JS + `fetch`。
+* 功能：添加、删除、标记完成、按优先级和分类展示，支持搜索/过滤。
+* 持久化：用本地 `data.json` 文件（简单 file-based storage，非数据库）。
+* 目录结构固定（lab3-doc/李华-230111234/...）。
+
+下面我将分步提示你如何完成这项任务。
+
+# Step 1 · 生成后端
+
+请基于上一步规划，**生成完整的 `app.py`**（Flask 2.x 兼容），要求：
+
+1. 路由：
+
+* `GET /api/todos`（支持 query：`q` 关键字、`category`、`priority`、`completed`）
+* `POST /api/todos`（JSON: `title`*、`priority` in {low, medium, high}、`category`、`due_date` 可选）
+* `PATCH /api/todos/<id>`（允许更新 `title|priority|category|completed|due_date`）
+* `DELETE /api/todos/<id>`
+
+2. 数据结构：
+
+```json
+{ 
+    "id": "uuid", 
+    "title": "str", 
+    "priority": "low|medium|high", 
+    "category": "str", 
+    "completed": false, 
+    "created_at": "ISO", 
+    "due_date": "ISO|null" 
+}
+```
+
+3. 存储：读写 `project/data.json`；启动时若无文件自动创建；并发写入用文件锁或简单的“读-改-写”串行保证。
+4. 返回统一 JSON：`{"ok": true, "data": ...}` 或 `{"ok": false, "error": "msg"}`；对 400/404 做清晰报错。
+5. 添加 `flask_cors` 的 CORS。
+6. 提供 `if __name__ == "__main__": app.run(host="127.0.0.1", port=5000, debug=True)`。
+7. 给出 `requirements.txt`（最小集合）。
+8. 代码注释：解释关键设计点与易错点。
+
+---
+
+# Step 2 · 测试接口
+
+为了在没有前端时自测后端，请给出一份**可直接复制执行的接口自测清单**（bash 版，使用 `curl`），覆盖：
+
+* 新增几条 todo（不同优先级/分类/是否带 `due_date`）。
+* 查询全部、按分类/优先级/完成状态过滤、关键字搜索。
+* 标记完成（PATCH）、修改标题/分类/优先级。
+* 删除一条，再确认列表。
+  要求：每条命令前用一行注释说明；并附带期望返回 JSON 的关键字段示例。
+
+---
+
+# Step 3 · 前端
+
+生成 `project/index.html`，要求：
+
+* 纯静态 HTML，引用同目录下的 `style.css` 与 `script.js`。
+* 顶部：Logo/标题 + `新增待办` 输入行（标题、分类、优先级、可选截止日期）+ “添加”按钮。
+* 中部：过滤区（搜索框、分类下拉、优先级下拉、完成状态切换）。
+* 列表区：按优先级分组或按筛选结果展示，每条包含复选框（完成）、标题、分类、优先级、截止日期、删除按钮。
+* 底部：统计信息（总数/已完成/未完成）。
+* 适度语义化（`<header> <main> <section> <footer>`），为后续 CSS 预留 class/id。
+* 不加入任何第三方库。
+* 确保页面打开后不会报错，即使后端未启动也能显示“未连接”的提示占位。
+
+---
+
+# Step 4 · 生成前端逻辑（`script.js`）
+
+生成 `project/script.js`，要求：
+
+* 将 `BASE_URL` 固定为 `http://localhost:5000`。
+* 封装 API：`listTodos(params)`, `createTodo(payload)`, `updateTodo(id, patch)`, `deleteTodo(id)`（使用 `fetch`）。
+* 初始加载：拉取列表，渲染到 DOM；渲染时按优先级排序（high > medium > low），并显示分类和截止日期。
+* 交互：
+
+  * 添加：读取表单 -> 调用 `POST` -> 清空输入 -> 刷新列表；
+  * 过滤：键入搜索或切换分类/优先级/完成状态即触发 `GET`；
+  * 勾选完成：触发 `PATCH`；
+  * 删除：触发 `DELETE`；
+  * inline 编辑标题（双击标题 -> 输入框 -> `Enter` 保存为 `PATCH`）。
+* 错误处理：将后端 `{"ok": false, "error": ...}` 渲染到顶部的 `toast`/`alert` 区域，3 秒后自动消失。
+* 轻量状态管理：内存里缓存 `todos` + 当前 `filters`，避免不必要的全量刷新。
+* 提供 `renderEmptyState()` 在无数据时展示友好提示。
+
+---
+
+# Step 5 · 生成样式（`style.css`）
+
+生成 `project/style.css`，要求：
+
+* 简洁清爽、深色/浅色都可读；列表项 hover 有轻微阴影；已完成条目用灰度和删除线；
+* 优先级标记使用小圆点（纯 CSS），高/中/低有不同强调度；
+* 移动端自适应：宽度 < 480px 时列表单列显示、表单换行；
+* 提供 `.toast` 样式用于错误提示；
+* 只用原生 CSS，不使用框架；
+* 注释说明关键布局。
+
+---
+
+# Step 6 · 生成 README（`README.md`）
+
+生成 `README.md`（中文），内容包含：
+
+* 项目简介（课程作业、ToDoList 功能）。
+* 目录结构（按题目要求）。
+* 环境准备与运行步骤（`python -m venv`、`pip install -r requirements.txt`、`python app.py`、打开 `index.html`）。
+* 接口列表与示例请求/响应（简要版）。
+* 常见问题（CORS、5000 端口被占用、Windows 文件锁问题的简易处理等）。
+
+---
+
+# Step 7 · 生成 `prompt.txt`
+
+请根据本项目从 0 到 1 的过程，整理一份我可提交的 `prompt.txt`，内容应描述：
+
+* 我向 AI 的关键指令摘要（按阶段：规划/后端/测试/前端/样式/打包）。
+* 你给出的关键实现决策（例如：数据结构、错误返回格式、排序策略、文件存储策略）。
+* 任何与课程要求对齐的点（端口、技术栈、目录）。
+  要求：列表清晰、可复用，便于老师审阅“AI 协作过程”。
+
+

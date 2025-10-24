@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TodoList</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <h1>TodoList</h1>
+      <div class="subtitle">简洁、流畅、苹果风格的待办</div>
+    </header>
+
+    <div class="toolbar">
+      <button id="openCreateBtn" class="btn primary">＋ 新建任务</button>
+
+      <div class="controls">
+        <div class="filter-row">
+          <label class="field">优先级
+            <select id="filterPriority" class="mini">
+              <option value="">全部</option>
+              <option value="low">Low</option>
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+            </select>
+          </label>
+
+          <label class="field">分类
+            <select id="filterCategory" class="mini">
+              <option value="">全部</option>
+            </select>
+          </label>
+
+          <label class="field">状态
+            <select id="filterCompleted" class="mini">
+              <option value="all">全部</option>
+              <option value="completed">已完成</option>
+              <option value="not_completed">未完成</option>
+            </select>
+          </label>
+
+          <label class="field">排序（截止）
+            <select id="sortDue" class="mini">
+              <option value="">无</option>
+              <option value="due_asc">截止升序</option>
+              <option value="due_desc">截止降序</option>
+            </select>
+          </label>
+
+          <button id="clearFilter" class="btn ghost">清除</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+      <div id="progressText" class="progress-text">完成 0 / 0 (0%)</div>
+    </div>
+
+    <ul id="todoList" class="todo-list"></ul>
+  </div>
+
+  <!-- 新建任务模态 -->
+  <div id="createModal" class="modal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header"><h3>新建任务</h3></div>
+      <form id="createForm" class="modal-body">
+        <label>任务
+          <input id="m_task" name="task" type="text" placeholder="任务内容" required>
+        </label>
+
+        <label>截止日期
+          <input id="m_due" name="due" type="date">
+          <small>留空表示“暂无”</small>
+        </label>
+
+        <label>分类（选择或新建）
+          <select id="m_category_select"></select>
+          <input id="m_category_new" type="text" placeholder="输入新分类名" style="display:none;margin-top:6px">
+        </label>
+
+        <label>优先级
+          <select id="m_priority" name="priority">
+            <option value="low">Low</option>
+            <option value="normal" selected>Normal</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" id="createCancel">取消</button>
+          <button type="submit" class="btn primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 编辑任务模态 -->
+  <div id="editModal" class="modal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header"><h3>编辑任务</h3></div>
+      <form id="editForm" class="modal-body">
+        <label>任务
+          <input id="e_task" name="task" type="text" placeholder="任务内容" required>
+        </label>
+
+        <label>截止日期
+          <input id="e_due" name="due" type="date">
+          <small>留空表示“暂无”</small>
+        </label>
+
+        <label>分类（选择或新建）
+          <select id="e_category_select"></select>
+          <input id="e_category_new" type="text" placeholder="输入新分类名" style="display:none;margin-top:6px">
+        </label>
+
+        <label>优先级
+          <select id="e_priority" name="priority">
+            <option value="low">Low</option>
+            <option value="normal" selected>Normal</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+
+        <label style="display:flex;align-items:center;gap:8px;margin-top:6px">
+          <input id="e_completed" type="checkbox" style="width:16px;height:16px">
+          <span>已完成</span>
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" id="editCancel">取消</button>
+          <button type="submit" class="btn primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 确认模态 -->
+  <div id="confirmModal" class="modal" aria-hidden="true">
+    <div class="modal-dialog small">
+      <div class="modal-body">
+        <div id="confirmText">确认要删除该任务吗？</div>
+        <div class="modal-actions" style="margin-top:12px;">
+          <button id="confirmNo" class="btn ghost">取消</button>
+          <button id="confirmYes" class="btn danger">确认删除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
