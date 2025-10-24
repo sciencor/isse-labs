@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TodoList 任务管理系统</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>🗒️ 我的任务清单</h1>
+
+    <!-- 输入区域 -->
+    <div class="input-section">
+      <input type="text" id="taskTitle" placeholder="输入新的待办事项...">
+
+      <select id="taskCategory">
+        <option value="学习">学习</option>
+        <option value="工作">工作</option>
+        <option value="生活">生活</option>
+      </select>
+
+      <select id="taskPriority">
+        <option value="高">高</option>
+        <option value="中" selected>中</option>
+        <option value="低">低</option>
+      </select>
+
+      <button id="addBtn">添加任务</button>
+    </div>
+
+    <!-- 筛选区域 -->
+    <div class="filter-section">
+      <label>筛选：</label>
+      <select id="filterCategory">
+        <option value="">全部分类</option>
+        <option value="学习">学习</option>
+        <option value="工作">工作</option>
+        <option value="生活">生活</option>
+      </select>
+
+      <select id="filterPriority">
+        <option value="">全部优先级</option>
+        <option value="高">高</option>
+        <option value="中">中</option>
+        <option value="低">低</option>
+      </select>
+
+      <button id="filterBtn">应用筛选</button>
+      <button id="clearFilterBtn">清除筛选</button>
+    </div>
+
+    <!-- 任务列表 -->
+    <div id="taskList" class="task-list"></div>
+  </div>
+
+  <!-- 编辑任务模态框 -->
+  <div id="edit-modal">
+    <div class="modal-content">
+      <h2>编辑任务</h2>
+      <input type="text" id="edit-title" placeholder="任务名称">
+      <input type="text" id="edit-category" placeholder="分类">
+      <select id="edit-priority">
+        <option value="高">高</option>
+        <option value="中">中</option>
+        <option value="低">低</option>
+      </select>
+      <button id="save-edit">保存修改</button>
+      <button id="cancel-edit">取消</button>
+    </div>
+  </div>
+
+  <!-- 烟花特效容器 -->
+  <canvas id="fireworks"></canvas>
+
+  <!-- JS脚本 -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
