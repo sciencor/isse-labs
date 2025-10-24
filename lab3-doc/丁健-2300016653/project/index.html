@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo List</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ToDo List</h1>
+        
+        <!-- 分组管理区域 -->
+        <div class="group-management">
+            <h2>分组管理</h2>
+            <div class="group-controls">
+                <input type="text" id="new-group-name" placeholder="新分组名称">
+                <button id="add-group-btn">添加分组</button>
+                
+                <select id="group-selector">
+                    <option value="默认">默认</option>
+                    <option value="工作">工作</option>
+                    <option value="入门">入门</option>
+                </select>
+                <button id="rename-group-btn">重命名</button>
+                <button id="remove-group-btn">删除分组</button>
+            </div>
+        </div>
+        
+        <!-- 任务添加区域 -->
+        <div class="task-input">
+            <input type="text" id="task-input" placeholder="添加新任务...">
+            <select id="priority-selector">
+                <option value="0">0星</option>
+                <option value="1">1星</option>
+                <option value="2">2星</option>
+                <option value="3">3星</option>
+            </select>
+            <select id="group-selector">
+                <option value="默认">默认</option>
+                <option value="工作">工作</option>
+                <option value="入门">入门</option>
+            </select>
+            <button id="add-task-btn">添加</button>
+        </div>
+        
+        <!-- 任务列表区域 -->
+        <div class="task-list">
+            <h2>任务列表</h2>
+            <ul id="todo-list">
+                <!-- 任务将通过JavaScript动态加载 -->
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
