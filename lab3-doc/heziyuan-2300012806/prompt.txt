@@ -1,0 +1,47 @@
+In GPT
+
+后端：
+帮我做一个TodoList系统完成以下功能：1.可输入待办事项
+2.展示在列表中
+3.可删除和完成任务
+4.可按照等级分类
+5.可分类事项请先用flask完成一个后端，并告诉我怎么测试
+FAILED
+首先，在测试阶段，\作为换行符似乎不能再vscode的终端中直接使用，请换一种方式完成测试
+FAILED
+PS C:\Users\heziy\Desktop\AIsoftware\hw3-vibecodinng> curl -X POST http://127.0.0.1:5000/todos -H "Content-Type: application/json" -d "{\"title\": \"学习 Flask\", \"category\": \"学习\", \"level\": \"高\"}"
+Invoke-WebRequest : 无法绑定参数“Headers”。无法将“System.String”类型的“Content-Type: application/json”值转
+换为“System.Collections.IDictionary”类型。
+所在位置 行:1 字符: 45
++ ... tp://127.0.0.1:5000/todos -H "Content-Type: application/json" -d "{\" ...
++                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Invoke-WebRequest]，ParameterBindingException
+    + FullyQualifiedErrorId : CannotConvertArgumentNoMessage,Microsoft.PowerShell.Commands.InvokeWebRequestComm  
+   and
+PASSED
+帮我使用方法1改写所有的后端接口测试
+PASSED
+请帮我写一个一个对应的 HTML+JS 前端页面，可以直接通过浏览器添加 / 删除 / 完成任务？并且简要描述如何在vscode中配置对应环境
+PASSED
+后端接口不变，前端如下改动:设计一个主页面index.html，包含以下部分：
+输入框（输入待办事项标题）；
+下拉菜单（选择分类与优先级）；
+“添加任务”按钮；
+任务展示区（列表形式，每项包含任务名、类别、优先级、状态、操作按钮）。
+页面使用简洁布局：
+顶部：输入表单；
+中间：任务列表；
+底部：筛选功能区（按分类/ 优先级）。
+样式说明：
+未完成任务灰色；
+已完成任务加删除线,转为绿色； 
+高优先级任务红色标识。
+PASSED
+
+In copilot
+帮我加一个json持久化Todolist的功能，只需要改变app.py
+PASSED
+我在将所有文件移动到新文件夹下在json中持久化记录todolist的功能不可用了，请帮我修复下，应该是路径查找的问题
+FAILED
+我希望将task.json和todo.db保存到C:\Users\heziy\Desktop\AIsoftware\isse-labs\lab3-doc\heziyuan-2300012806下，请帮我修改代码
+PASSED
