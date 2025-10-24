@@ -1,0 +1,124 @@
+# 你的角色
+你是严谨的全栈工程师 + 稳健发布负责人。请**严格**按照我定义的两阶段交付与两个 Git 提交来产出内容。任何跨阶段泄露内容都视为不合格。
+
+# 项目背景
+实现 ToDoList：添加、删除、标记完成、按优先级和分类展示。
+- 后端：Flask，监听 http://localhost:5000 ，**仅返回 JSON**。
+- 前端：纯 HTML + JS + fetch 调用接口，实现完整交互。
+- 目录根：lab3-doc/封帆-2300018314/ （在你的输出里需使用这个相对路径）
+
+# 绝对规则：分两阶段、两个 commit
+- **阶段 A（后端提交）**：只交付后端与最小 README（后端版），提供完整接口与自测指令；**不得**输出任何前端文件内容（index.html / script.js / style.css），也不要内联前端片段、示意占位或链接。若包含前端内容，判定为不合格。
+- **阶段 B（前端提交）**：在我明确回复“继续前端”或“继续第2步”后，才输出前端与完整 README（前后端版），并给出第二次提交命令。
+- 两次输出之间你必须**停止**，等待我的继续指令。不要试图在一次消息中完成两阶段。
+- 每个阶段都需要给出**Git 提交命令**（git add/commit），且仅包含当阶段允许的文件。
+
+# 目录结构（最终态，分两次提交完成）
+lab3-doc/
+└── 封帆-2300018314/
+    ├── prompt.txt
+    ├── screenshot.png          # 阶段 B 提交中创建一个占位文件（允许 0 字节）；我之后会替换为运行截图
+    ├── README.md               # 阶段 A 先给“后端版最小 README”，阶段 B 覆盖为“完整版”
+    └── project/
+        ├── app.py              # 阶段 A 提交
+        ├── index.html          # 阶段 B 提交
+        ├── script.js           # 阶段 B 提交
+        ├── style.css           # 阶段 B 提交
+        └── tasks.json          # 阶段 A 首次运行自动创建为 []；如需初始化可在阶段 A 一并生成空数组文件
+
+# 数据模型（后端与前端共享）
+Task:
+- id: number（自增，从 1 开始）
+- title: string（1~100 字，必填）
+- priority: number（1=低, 2=中, 3=高；默认 2；入参可用字符串别名 "low"|"medium"|"high"，存储与返回统一为 number）
+- category: string（默认 "General"）
+- completed: boolean（默认 false）
+- created_at: string（ISO8601）
+- updated_at: string（ISO8601）
+
+# 统一响应格式
+- 成功：{ "ok": true, "data": ... }
+- 失败：{ "ok": false, "error": { "code": "BadRequest|NotFound|ServerError", "message": "..." } }，并配套 4xx/5xx 状态码
+
+# API 规范（阶段 A 必须实现）
+基准路径 /api：
+1) GET /api/tasks
+   - query: sort=("priority"|"created" 默认 "created"), order=("asc"|"desc" 默认 "desc")，
+            category=string（可选），status=("all"|"active"|"completed" 默认 "all")
+   - 返回 data: Task[]
+
+2) POST /api/tasks
+   - body: { title: string, priority?: number|"low"|"medium"|"high", category?: string }
+   - 校验：title 非空且 ≤100；priority ∈ {1,2,3}（或别名映射）
+   - 返回 data: 新建 Task
+
+3) PATCH /api/tasks/<int:id>
+   - body: { title?, priority?, category?, completed? }
+   - 404：id 不存在
+   - 返回 data: 更新后的 Task
+
+4) PATCH /api/tasks/<int:id>/toggle
+   - 切换 completed；返回 data: 更新后的 Task
+
+5) DELETE /api/tasks/<int:id>
+   - 删除；404：id 不存在
+   - 返回 data: { "id": <id> }
+
+# 实现细则（阶段 A 要求）
+- 持久化：使用 JSON 文件 lab3-doc/封帆-2300018314/project/tasks.json
+  - load_db()/save_db() 封装；文件不存在则创建为 []
+  - 写操作更新 updated_at；创建时写 created_at 与 updated_at
+  - id 自增：空数组时从 1 开始
+- 仅后端可运行：启动后访问根路径 "/" 可返回 `{ ok: true, data: "backend running" }` 之类健康检查，**不要**在阶段 A 尝试返回前端页面
+- 错误处理：集中封装错误响应，统一结构
+- CORS：若根路径仅提供健康检查且前端最终由同域静态服务，可不启用；如你选择分离静态，再在阶段 B 中开启或配置同域服务
+- 代码风格：适度注释，函数小而清晰
+
+# 阶段 A —— 你的输出内容（只此四类）
+1) **文件**：lab3-doc/封帆-2300018314/project/app.py
+   - 完整 Flask 实现（含 API、错误处理、JSON 读写、自增 id、排序筛选、健康检查）
+2) **文件（可选）**：lab3-doc/封帆-2300018314/project/tasks.json
+   - 初始内容为 []（若你在运行时自动创建，也可不输出该文件）
+3) **文件**：lab3-doc/封帆-2300018314/README.md（后端版最小 README）
+   - 内容包含：项目简介、后端运行步骤、环境安装命令、端口说明、API 简表、**curl 自测脚本段**（覆盖新增/查询/更新/切换/删除），以及“等待阶段 B 开启前端”的说明
+4) **Git 提交命令（纯文本命令块）**：
+   - 仅包含阶段 A 允许的文件，示例：
+     ```
+     git add lab3-doc/封帆-2300018314/project/app.py lab3-doc/封帆-2300018314/README.md lab3-doc/封帆-2300018314/project/tasks.json
+     git commit -m "feat(api): Flask backend with JSON storage and REST endpoints"
+     ```
+- **禁止输出**任何前端文件或其片段（index.html / script.js / style.css），也**禁止**在阶段 A 的 README 中内嵌前端代码。
+- 输出完成后**停止**，并在最后写一句“等待我回复『继续前端』再进行阶段 B”。
+
+# 阶段 B —— （只在我回复“继续前端”后再输出）
+1) **文件**：lab3-doc/封帆-2300018314/project/index.html
+2) **文件**：lab3-doc/封帆-2300018314/project/script.js
+   - 使用 fetch 调用 /api/*，实现：添加、删除、切换完成、筛选（分类/状态）、排序（优先级/创建时间，升/降）、统计（总数/完成数）、错误提示、加载态
+3) **文件**：lab3-doc/封帆-2300018314/project/style.css
+   - 简洁风格；完成项加删除线与淡化；列表项 hover 效果
+4) **文件**：lab3-doc/封帆-2300018314/README.md（覆盖为**完整版**）
+   - 增补：前端说明、页面结构、操作指引、浏览器访问步骤、常见错误排查、扩展建议（如迁移到 SQLite/SQLAlchemy）
+5) **占位文件**：lab3-doc/封帆-2300018314/screenshot.png
+   - 给出命令创建占位（允许 0 字节），我会后续替换真实截图
+6) **Git 提交命令（纯文本命令块）**：
+git add lab3-doc/封帆-2300018314/project/index.html lab3-doc/封帆-2300018314/project/script.js lab3-doc/封帆-2300018314/project/style.css lab3-doc/封帆-2300018314/README.md lab3-doc/封帆-2300018314/screenshot.png
+git commit -m "feat(ui): static frontend with fetch integration, filters & sorting"
+
+markdown
+复制代码
+
+# 接口与前端交互要点（阶段 B 实现时遵循）
+- 前端表单：title（必填）、category（可空默认 General）、priority（低/中/高 → 1/2/3）
+- 列表项展示：title、category、priority 标识、completed 复选框、删除按钮、时间信息（created/updated）
+- 过滤/排序：实时调用 GET /api/tasks?... 并在 UI 反馈加载/错误
+- fetch 封装：若响应 {ok:false}，显示 error.message
+
+# 质量与验收
+- 阶段 A：`python lab3-doc/封帆-2300018314/project/app.py` 能启动；用 README 提供的 curl 全通过；JSON 文件自动创建且结构正确
+- 阶段 B：浏览器操作全流程可用；筛选/排序/统计正确；样式简洁清晰
+- 任何阶段如越权输出，将被判定为不合格
+
+# 输出格式（两次分别输出）
+- 每个文件用独立代码块包裹，且在代码块**上方一行**写明“文件路径：<相对路径>”
+- 阶段 A 仅输出：app.py、（可选）tasks.json、README.md、Git 提交命令
+- 等我回复“继续前端”后，再输出阶段 B 文件与第二次提交命令
