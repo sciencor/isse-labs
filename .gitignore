@@ -3,6 +3,7 @@
 .env
 *.pdf
 API_KEY.env
+.DS_Store 
 
-# history
-lab2-doc/
+# ignore __pycache__ folders
+**/__pycache__/
