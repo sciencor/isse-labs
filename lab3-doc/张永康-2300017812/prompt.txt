@@ -1,0 +1,53 @@
+你是一个专业的AI代码生成器，现在请按照以下详细规范，使用Python Flask作为后端、HTML/CSS/JavaScript作为前端，创建一个完整的TodoList任务管理系统。整个开发过程必须严格分阶段进行，每阶段生成相应的代码和说明，并在生成后进行自检测试。项目文件结构必须遵循以下要求：项目代码放置在project/文件夹下，包括app.py（后端）、index.html（前端页面）、script.js（前端逻辑）、style.css（样式文件）。所有代码必须清晰、可扩展，使用RESTful API，后端返回JSON格式，前端使用fetch调用接口。数据暂使用内存列表模拟存储，不使用数据库。
+
+### 项目功能要求
+- 用户可以通过输入框添加新的待办事项，包括标题、类别（学习/工作/生活/其他字符串）和优先级（高/中/低）。
+- 待办事项以列表形式展示，每项显示标题、类别、优先级、状态（完成/未完成），并提供删除和标记完成的按钮。
+- 支持按类别或优先级筛选任务。
+- 标记完成的任务显示删除线，未完成任务显示灰色。
+- 后端接口返回统一JSON格式：{"status": "success" 或 "error", "data": [任务列表或单个任务], "message": "操作信息"}。
+- 每个任务对象字段：{"id": 整数, "title": "字符串", "category": "学习/工作/生活/等", "priority": "高/中/低", "completed": false/true}。
+
+### 开发阶段要求
+请严格按以下阶段顺序生成代码，每阶段输出完整的代码文件内容、说明和测试步骤。每个阶段完成后，假设代码已测试通过，再进入下一阶段。整个过程模拟逐步开发，确保逻辑独立。
+
+**阶段1: 后端接口设计和实现**
+- 生成app.py文件。
+- 实现Flask应用，运行在http://localhost:5000。
+- 定义以下RESTful路由：
+  - GET /tasks：返回所有任务列表，支持可选查询参数?category=xxx 和 ?priority=xxx 进行筛选（例如?category=学习&priority=高）。
+  - POST /tasks：接收JSON body（包含title, category, priority），新增任务，自动生成id，返回新增后的任务。
+  - PUT /tasks/<id>：接收JSON body（{"completed": true/false}），更新任务状态，返回更新后的任务。
+  - DELETE /tasks/<id>：删除指定id的任务，返回成功消息。
+- 使用全局列表（如tasks = []）存储任务数据。
+- 处理错误情况，如无效id返回error status。
+- 测试说明：使用Postman或curl测试每个接口，确保返回正确JSON。示例：curl -X GET http://localhost:5000/tasks；curl -X POST -H "Content-Type: application/json" -d '{"title": "写报告", "category": "学习", "priority": "高"}' http://localhost:5000/tasks。
+- 输出：app.py完整代码，以及测试结果模拟说明。
+
+**阶段2: 前端页面结构和样式设计**
+- 生成index.html和style.css文件。
+- index.html结构：
+  - 顶部：表单，包括输入框（id="title"）、下拉菜单（id="category"，选项：学习/工作/生活）、下拉菜单（id="priority"，选项：高/中/低）、添加按钮（onclick调用JS函数）。
+  - 中间：任务列表区（<ul id="task-list">），动态渲染任务项，每项包括<span>显示标题/类别/优先级/状态，按钮：标记完成（toggleCompleted）和删除（deleteTask）。
+  - 底部：筛选区，下拉菜单或按钮，按类别/优先级筛选，调用JS刷新列表。
+- style.css：定义样式，未完成任务color: gray; 已完成任务text-decoration: line-through; 整体布局简洁，使用flex或grid。
+- 输出：index.html和style.css完整代码，以及页面布局描述。
+
+**阶段3: 前端逻辑实现**
+- 生成script.js文件。
+- 使用JavaScript实现交互：
+  - 页面加载时，fetch GET /tasks 获取并渲染任务列表。
+  - 添加按钮：收集表单数据，fetch POST /tasks 新增，成功后刷新列表。
+  - 标记完成按钮：fetch PUT /tasks/<id> 更新completed，刷新列表。
+  - 删除按钮：fetch DELETE /tasks/<id>，刷新列表。
+  - 筛选功能：根据下拉选择，构造查询参数fetch GET /tasks?category=...&priority=...，渲染过滤结果。
+- 处理错误：使用try-catch或.then/.catch显示alert消息。
+- 输出：script.js完整代码，以及交互逻辑流程说明。
+
+**阶段4: 整体集成和测试**
+- 整合所有文件，确保前后端连通。
+- 运行说明：在project/目录下运行python app.py，打开index.html在浏览器查看。
+- 测试用例：添加3个任务，标记一个完成，删除一个，按类别筛选，验证页面更新。
+- 输出：README.md内容，包括运行步骤和截图描述（假设用户提供screenshot.png）。
+
+生成代码时，确保所有文件符合目录结构project/下放置。最终输出所有阶段的代码和说明，作为一个完整的TodoList应用。
