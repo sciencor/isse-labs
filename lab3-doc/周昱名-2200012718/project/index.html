@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList 任务管理系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 TodoList 任务管理系统</h1>
+            <p>高效管理您的任务和待办事项</p>
+        </div>
+
+        <div class="content">
+            <!-- 添加任务表单 -->
+            <div class="add-task-form">
+                <h2>添加新任务</h2>
+                <div class="form-group">
+                    <label for="taskTitle">任务标题</label>
+                    <input type="text" id="taskTitle" placeholder="请输入任务内容..." maxlength="100">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskCategory">类别</label>
+                        <select id="taskCategory">
+                            <option value="学习">学习</option>
+                            <option value="工作">工作</option>
+                            <option value="生活">生活</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskPriority">优先级</label>
+                        <select id="taskPriority">
+                            <option value="高">高</option>
+                            <option value="中" selected>中</option>
+                            <option value="低">低</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-block" id="addTaskBtn">添加任务</button>
+            </div>
+
+            <!-- 筛选功能区 -->
+            <div class="filters">
+                <div class="filter-group">
+                    <h3>按类别筛选</h3>
+                    <div class="filter-options" id="categoryFilters">
+                        <button class="filter-btn active" data-category="">全部</button>
+                        <button class="filter-btn" data-category="学习">学习</button>
+                        <button class="filter-btn" data-category="工作">工作</button>
+                        <button class="filter-btn" data-category="生活">生活</button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h3>按优先级筛选</h3>
+                    <div class="filter-options" id="priorityFilters">
+                        <button class="filter-btn active" data-priority="">全部</button>
+                        <button class="filter-btn" data-priority="高">高</button>
+                        <button class="filter-btn" data-priority="中">中</button>
+                        <button class="filter-btn" data-priority="低">低</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 任务列表 -->
+            <div class="task-list-container">
+                <h2>任务列表</h2>
+                <div class="task-list" id="taskList">
+                    <div class="loading">加载任务中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
