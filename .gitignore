@@ -5,5 +5,8 @@
 API_KEY.env
 .DS_Store 
 
+# history
+lab2-doc/
+lab3-doc/
 # ignore __pycache__ folders
 **/__pycache__/
