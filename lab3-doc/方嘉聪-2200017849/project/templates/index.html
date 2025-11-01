@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>TodoList 任务管理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>任务管理系统</h1>
+            <form id="task-form" class="task-form">
+                <input type="text" id="task-title" placeholder="输入待办事项" required>
+                <select id="task-category" required>
+                    <option value="">选择分类</option>
+                    <option value="学习">学习</option>
+                    <option value="工作">工作</option>
+                    <option value="生活">生活</option>
+                </select>
+                <select id="task-priority" required>
+                    <option value="">选择优先级</option>
+                    <option value="高">高</option>
+                    <option value="中">中</option>
+                    <option value="低">低</option>
+                </select>
+                <input type="datetime-local" id="task-due-date" required>
+                <button type="submit">添加任务</button>
+            </form>
+        </header>
+
+        <section class="toolbar glass-card">
+            <div class="filter-group">
+                <label for="filter-category">分类：</label>
+                <select id="filter-category">
+                    <option value="">全部</option>
+                    <option value="学习">学习</option>
+                    <option value="工作">工作</option>
+                    <option value="生活">生活</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-priority">优先级：</label>
+                <select id="filter-priority">
+                    <option value="">全部</option>
+                    <option value="高">高</option>
+                    <option value="中">中</option>
+                    <option value="低">低</option>
+                </select>
+            </div>
+            <div class="search-group">
+                <input type="search" id="search-input" placeholder="按标题关键词搜索">
+                <button id="search-button" type="button">搜索</button>
+                <button id="search-reset" type="button" title="清除搜索">清空</button>
+            </div>
+            <div class="sort-group">
+                <label for="sort-field">排序依据：</label>
+                <select id="sort-field">
+                    <option value="due_date">截止时间</option>
+                    <option value="priority">优先级</option>
+                </select>
+                <button id="sort-asc" type="button">升序</button>
+                <button id="sort-desc" type="button">降序</button>
+            </div>
+            <button id="reset-filters" type="button">显示全部</button>
+        </section>
+
+        <section class="bulk-actions glass-card">
+            <label class="select-all">
+                <input type="checkbox" id="select-all"> 全选当前列表
+            </label>
+            <div class="bulk-buttons">
+                <button id="bulk-complete" type="button">批量标记完成</button>
+                <button id="bulk-delete" type="button">批量删除</button>
+            </div>
+        </section>
+
+        <main class="task-list-wrapper">
+            <section class="task-section glass-card">
+                <div class="section-header">
+                    <h2>未完成任务</h2>
+                    <span id="pending-count" class="section-count">0</span>
+                </div>
+                <ul id="pending-list" class="task-list"></ul>
+            </section>
+            <section class="task-section glass-card">
+                <div class="section-header">
+                    <h2>已完成任务</h2>
+                    <span id="completed-count" class="section-count">0</span>
+                </div>
+                <ul id="completed-list" class="task-list"></ul>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
