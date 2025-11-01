@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList 任务管理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部：输入表单 -->
+        <div class="header">
+            <h1>TodoList 任务管理系统</h1>
+            <p>高效管理您的日常任务</p>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="taskInput">任务标题</label>
+                    <input type="text" id="taskInput" placeholder="输入新任务...">
+                </div>
+                
+                <div class="input-field">
+                    <label for="prioritySelect">优先级</label>
+                    <select id="prioritySelect">
+                        <option value="高">高优先级</option>
+                        <option value="中">中优先级</option>
+                        <option value="低">低优先级</option>
+                    </select>
+                </div>
+                
+                <div class="input-field">
+                    <label for="categorySelect">分类</label>
+                    <select id="categorySelect">
+                        <option value="学习">学习</option>
+                        <option value="工作">工作</option>
+                        <option value="生活">生活</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; align-items: flex-end;">
+                    <button id="addTaskBtn" class="add-task-btn">添加任务</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 中间：任务列表 -->
+        <div class="tasks-container">
+            <h3>我的任务</h3>
+            <ul id="taskList" class="task-list"></ul>
+        </div>
+        
+        <!-- 底部：筛选功能区 -->
+        <div class="filter-section">
+            <h3>筛选任务</h3>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">全部</button>
+                <button class="filter-btn" data-filter="学习">学习</button>
+                <button class="filter-btn" data-filter="工作">工作</button>
+                <button class="filter-btn" data-filter="生活">生活</button>
+                <button class="filter-btn" data-filter="high">高优先级</button>
+                <button class="filter-btn" data-filter="medium">中优先级</button>
+                <button class="filter-btn" data-filter="low">低优先级</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

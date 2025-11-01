@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList 任务管理系统</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>TodoList 任务管理系统</h1>
+        
+        <!-- 输入表单 -->
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="taskInput" placeholder="输入新的待办事项...">
+                <select id="categorySelect">
+                    <option value="学习">学习</option>
+                    <option value="工作">工作</option>
+                    <option value="生活">生活</option>
+                </select>
+                <select id="prioritySelect">
+                    <option value="高">高</option>
+                    <option value="中">中</option>
+                    <option value="低">低</option>
+                </select>
+                <button id="addTaskBtn">添加任务</button>
+            </div>
+        </div>
+        
+        <!-- 筛选功能区 -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <span>按类别筛选:</span>
+                <button class="filter-btn active" data-filter="all">全部</button>
+                <button class="filter-btn" data-filter="学习">学习</button>
+                <button class="filter-btn" data-filter="工作">工作</button>
+                <button class="filter-btn" data-filter="生活">生活</button>
+            </div>
+            <div class="filter-group">
+                <span>按优先级筛选:</span>
+                <button class="filter-btn active" data-priority="all">全部</button>
+                <button class="filter-btn" data-priority="高">高</button>
+                <button class="filter-btn" data-priority="中">中</button>
+                <button class="filter-btn" data-priority="低">低</button>
+            </div>
+        </div>
+        
+        <!-- 任务列表 -->
+        <ul class="task-list" id="taskList">
+            <!-- 任务项将通过JavaScript动态生成 -->
+            <div class="empty-state">
+                <p>暂无任务，添加一个新任务开始吧！</p>
+            </div>
+        </ul>
+    </div>
+
+    <script src="static/script.js"></script>
+</body>
+</html>

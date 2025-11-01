@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>待办事项系统</title>
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            width: 70%;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-section {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        input, select, button {
+            font-size: 16px;
+            padding: 8px 12px;
+        }
+
+        input {
+            flex: 2;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        select {
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .stats {
+            text-align: right;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .task-list {
+            background: white;
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.4s ease;
+        }
+
+        .task-item.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .task-item.removed {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .task-title {
+            flex: 2;
+        }
+
+        .task-title.completed {
+            text-decoration: line-through;
+            color: green;
+        }
+
+        .task-meta {
+            flex: 2;
+            display: flex;
+            justify-content: space-around;
+            font-size: 14px;
+        }
+
+        .task-actions button {
+            margin-left: 6px;
+        }
+
+        .level-high {
+            color: red;
+            font-weight: bold;
+        }
+
+        .filter-section {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .filter-section select {
+            width: 180px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>待办事项系统</h1>
+
+        <div class="form-section">
+            <input type="text" id="title" placeholder="输入待办事项">
+            <select id="category">
+                <option value="">选择分类</option>
+                <option value="学习">学习</option>
+                <option value="工作">工作</option>
+                <option value="生活">生活</option>
+            </select>
+            <select id="level">
+                <option value="">选择优先级</option>
+                <option value="高">高</option>
+                <option value="中">中</option>
+                <option value="低">低</option>
+            </select>
+            <input type="date" id="ddl" title="DDL: 截止日期" />
+            <button onclick="addTodo()">添加任务</button>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="task-list" id="taskList"></div>
+
+        <div class="filter-section">
+            <select id="filterCategory" onchange="loadTodos()">
+                <option value="">筛选分类</option>
+                <option value="学习">学习</option>
+                <option value="工作">工作</option>
+                <option value="生活">生活</option>
+            </select>
+            <select id="filterLevel" onchange="loadTodos()">
+                <option value="">筛选优先级</option>
+                <option value="高">高</option>
+                <option value="中">中</option>
+                <option value="低">低</option>
+            </select>
+        </div>
+    </div>
+
+<script>
+    const API = 'http://127.0.0.1:5000/todos';
+
+    async function addTodo() {
+        const title = document.getElementById('title').value.trim();
+        const category = document.getElementById('category').value;
+        const level = document.getElementById('level').value;
+        const ddl = document.getElementById('ddl').value || '';
+        if (!title || !category || !level) {
+            alert("请填写完整信息！");
+            return;
+        }
+
+        await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, category, level, ddl })
+        });
+
+        document.getElementById('title').value = '';
+        loadTodos();
+    }
+
+    async function loadTodos() {
+        const res = await fetch(API);
+        let todos = await res.json();
+
+        const fCat = document.getElementById('filterCategory').value;
+        const fLvl = document.getElementById('filterLevel').value;
+        if (fCat) todos = todos.filter(t => t.category === fCat);
+        if (fLvl) todos = todos.filter(t => t.level === fLvl);
+
+        const list = document.getElementById('taskList');
+        list.innerHTML = '';
+        todos.forEach(todo => {
+            const div = document.createElement('div');
+            div.className = 'task-item';
+            div.dataset.id = todo.id;
+            div.dataset.completed = todo.completed ? 'true' : 'false';
+            div.innerHTML = `
+                <div class="task-title ${todo.completed ? 'completed' : ''}">${todo.title}</div>
+                <div class="task-meta">
+                    <span>${todo.category}</span>
+                    <span class="${todo.level === '高' ? 'level-high' : ''}">${todo.level}</span>
+                    <span>${todo.ddl ? 'DDL: ' + todo.ddl : ''}</span>
+                    <span class="task-status">${todo.completed ? '✅ 已完成' : '⌛ 未完成'}</span>
+                </div>
+                <div class="task-actions">
+                    <button onclick="toggleComplete(${todo.id})">${todo.completed ? '撤销' : '完成'}</button>
+                    <button onclick="deleteTodo(${todo.id}, this)">删除</button>
+                </div>
+            `;
+            list.appendChild(div);
+            setTimeout(() => div.classList.add('show'), 50);
+        });
+
+        updateStats(todos);
+    }
+
+    async function toggleComplete(id) {
+        const item = document.querySelector(`.task-item[data-id='${id}']`);
+        if (!item) return;
+
+        // 当前状态
+        const currentlyCompleted = item.dataset.completed === 'true';
+        const newState = !currentlyCompleted;
+
+        // 前端立即修改视觉
+        const titleEl = item.querySelector('.task-title');
+        const statusEl = item.querySelector('.task-status');
+        const btn = item.querySelector('.task-actions button');
+
+        titleEl.classList.toggle('completed', newState);
+        statusEl.textContent = newState ? '✅ 已完成' : '⌛ 未完成';
+        btn.textContent = newState ? '撤销' : '完成';
+        item.dataset.completed = newState ? 'true' : 'false';
+
+        // 更新后端
+        await fetch(`${API}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ completed: newState })
+        });
+
+        // 更新统计栏（不再重新加载全部）
+        updateStatsFromDOM();
+    }
+
+    async function deleteTodo(id, btn) {
+        const item = btn.closest('.task-item');
+        item.classList.add('removed');
+        setTimeout(async () => {
+            await fetch(`${API}/${id}`, { method: 'DELETE' });
+            item.remove();
+            updateStatsFromDOM();
+        }, 400);
+    }
+
+    function updateStats(todos) {
+        const total = todos.length;
+        const done = todos.filter(t => t.completed).length;
+        document.getElementById('stats').textContent = `共 ${total} 条任务，已完成 ${done} 条`;
+    }
+
+    function updateStatsFromDOM() {
+        const items = document.querySelectorAll('.task-item');
+        const total = items.length;
+        const done = Array.from(items).filter(el => el.dataset.completed === 'true').length;
+        document.getElementById('stats').textContent = `共 ${total} 条任务，已完成 ${done} 条`;
+    }
+
+    loadTodos();
+</script>
+
+
+</body>
+</html>

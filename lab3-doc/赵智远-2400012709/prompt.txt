@@ -1,0 +1,43 @@
+你是一名全栈助教。
+请帮我在当前空目录下一次性生成以下 4 个文件，要求：
+lab3-doc/赵智远-2400012709/
+├── prompt.txt          # 把本次你收到的这条 prompt 原样写进去
+├── README.md           # 一句话：Flask+JS 待办清单，运行方式「python app.py」
+├── project/
+│   ├── app.py          # 仅含 Flask 骨架：/ 路由返回 index.html
+│   ├── index.html      # 空壳，只留 <title>
+│   ├── script.js       # 空文件
+│   └── style.css       # 空文件
+不要额外文字，直接给出文件内容和路径即可。
+你是一名 Flask 后端工程师。
+请完成以下三步：
+先把下面这段 prompt 原文追加写入 lab3-doc/赵智远-2400012709/prompt.txt（保留之前内容，追加即可）。
+在 project/app.py 里实现一套 RESTful 待办清单接口，规范如下：
+• 运行端口：localhost:5000
+• 返回统一 JSON：{"code":0, "data": ..., "msg": ""}
+• 内存存储即可（list / dict），无需数据库
+接口清单：
+POST   /api/todo              新建  → 返回完整 todo 对象
+GET    /api/todo              列表  → 返回全部 todos
+PUT    /api/todo/int:tid    更新  → 返回更新后对象
+DELETE /api/todo/int:tid    删除  → 返回 {"code":0}
+Todo 字段：id(自增) title(必填) completed(默认false) priority(1-5,默认3) category(默认"default")
+额外支持查询参数：completed、category、priority。
+把本次新增的后端接口一句话写进 README.md（保持简洁，一句即可）。
+最后给出 3 条 curl 示例（增、查、改），方便我测试通过后再进入前端开发。
+你是一名原生 JS 前端工程师。
+请完成以下三步：
+先把下面这段 prompt 原文追加写入 lab3-doc/赵智远-2400012709/prompt.txt（保留之前内容，追加即可）。
+在 project/ 目录下补充 index.html + script.js + style.css，实现：
+功能
+新增：输入框 + 优先级下拉(1-5) + 分类输入 → 点击「添加」调用 POST /api/todo
+列表：按「全部 / 未完成 / 已完成」tab 过滤；支持按分类、优先级下拉筛选
+完成：点击复选框调用 PUT /api/todo/<id>
+删除：点击「×」调用 DELETE /api/todo/<id>
+优先级视觉：1=红色，2=橙，3=黄，4=浅绿，5=深绿
+技术约束
+• 仅用原生 fetch，不用任何框架
+• 所有接口地址用 //localhost:5000/api/todo…
+• CSS 用 flex 排版，宽度 400px 居中，简洁美观即可
+更新 README.md
+最后附一行「测试步骤：python app.py → 浏览器打开 http://localhost:5000」

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>待办事项管理器</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="input-panel card">
+        <h1>待办事项管理器</h1>
+        <form id="taskForm" class="task-form">
+          <input
+            id="taskTitle"
+            type="text"
+            placeholder="输入新的待办任务..."
+            required
+          />
+          <select id="taskCategory" required>
+            <option value="" disabled selected>选择分类</option>
+            <option value="学习">学习</option>
+            <option value="工作">工作</option>
+            <option value="生活">生活</option>
+          </select>
+          <select id="taskPriority" required>
+            <option value="" disabled selected>选择优先级</option>
+            <option value="高">高</option>
+            <option value="中">中</option>
+            <option value="低">低</option>
+          </select>
+          <input id="taskDueDate" type="date" required />
+          <button type="submit" class="btn-primary">添加任务</button>
+        </form>
+        <p id="statusMessage" class="status-message"></p>
+      </header>
+
+      <main class="task-list-section card">
+        <div class="section-header">
+          <h2>任务列表</h2>
+          <button id="refreshButton" class="btn-secondary">刷新列表</button>
+        </div>
+        <ul id="taskList" class="task-list"></ul>
+        <p id="emptyHint" class="empty-hint">暂无任务，快来添加一条吧！</p>
+      </main>
+
+      <footer class="filter-panel card">
+        <h3>筛选任务</h3>
+        <div class="filter-search">
+          <label for="searchKeyword">搜索任务</label>
+          <input
+            id="searchKeyword"
+            type="text"
+            placeholder="输入关键字..."
+          />
+        </div>
+        <div class="filter-controls">
+          <div class="filter-group">
+            <label for="filterCategory">分类</label>
+            <select id="filterCategory">
+              <option value="">全部</option>
+              <option value="学习">学习</option>
+              <option value="工作">工作</option>
+              <option value="生活">生活</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterPriority">优先级</label>
+            <select id="filterPriority">
+              <option value="">全部</option>
+              <option value="高">高</option>
+              <option value="中">中</option>
+              <option value="低">低</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="sortOption">排序</label>
+            <select id="sortOption">
+              <option value="">默认顺序</option>
+              <option value="dueDate">截止日期最早</option>
+              <option value="dueDateDesc">截止日期最晚</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button id="applyFilterButton" class="btn-primary">应用筛选</button>
+          <button id="clearFilterButton" class="btn-secondary">显示全部</button>
+        </div>
+      </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+  </body>
+</html>

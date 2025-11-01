@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>TodoList 任务管理系统</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="container">
+			<!-- 页面标题 -->
+			<header>
+				<h1>📝 TodoList 任务管理系统</h1>
+				<p>高效管理您的日常任务</p>
+			</header>
+
+			<!-- 添加任务表单 -->
+			<section class="add-task-section">
+				<h2>添加新任务</h2>
+				<form id="task-form" class="task-form">
+					<div class="form-group">
+						<label for="title">任务标题:</label>
+						<input
+							type="text"
+							id="title"
+							name="title"
+							placeholder="请输入任务标题"
+							required
+						/>
+					</div>
+
+					<div class="form-group">
+						<label for="category">类别:</label>
+						<select id="category" name="category">
+							<option value="学习">学习</option>
+							<option value="工作">工作</option>
+							<option value="生活">生活</option>
+							<option value="其他">其他</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="priority">优先级:</label>
+						<select id="priority" name="priority">
+							<option value="高">高</option>
+							<option value="中" selected>中</option>
+							<option value="低">低</option>
+						</select>
+					</div>
+
+					<button type="submit" class="btn btn-primary">添加任务</button>
+				</form>
+			</section>
+
+			<!-- 筛选区域 -->
+			<section class="filter-section">
+				<h2>任务筛选</h2>
+				<div class="filter-controls">
+					<div class="filter-group">
+						<label for="filter-category">按类别筛选:</label>
+						<select id="filter-category">
+							<option value="">全部类别</option>
+							<option value="学习">学习</option>
+							<option value="工作">工作</option>
+							<option value="生活">生活</option>
+							<option value="其他">其他</option>
+						</select>
+					</div>
+
+					<div class="filter-group">
+						<label for="filter-priority">按优先级筛选:</label>
+						<select id="filter-priority">
+							<option value="">全部优先级</option>
+							<option value="高">高</option>
+							<option value="中">中</option>
+							<option value="低">低</option>
+						</select>
+					</div>
+
+					<button id="clear-filters" class="btn btn-secondary">清除筛选</button>
+				</div>
+				<div id="filter-status" class="filter-status">
+					<span>当前筛选: 全部任务</span>
+					<span id="filter-count" class="filter-count">0</span>
+				</div>
+			</section>
+
+			<!-- 任务列表区域 -->
+			<section class="tasks-section">
+				<h2>任务列表 <span id="task-count">(0)</span></h2>
+				<div id="loading" class="loading hidden">加载中...</div>
+				<div id="error-message" class="error-message hidden"></div>
+				<ul id="task-list" class="task-list">
+					<!-- 任务项将动态插入这里 -->
+				</ul>
+				<div id="empty-message" class="empty-message hidden">
+					<p>暂无任务，请添加新任务</p>
+				</div>
+			</section>
+
+			<!-- 统计信息 -->
+			<section class="stats-section">
+				<div class="stats">
+					<div class="stat-item">
+						<span class="stat-number" id="total-tasks">0</span>
+						<span class="stat-label">总任务</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-number" id="completed-tasks">0</span>
+						<span class="stat-label">已完成</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-number" id="pending-tasks">0</span>
+						<span class="stat-label">待完成</span>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- 引入JavaScript文件 -->
+		<script src="script.js"></script>
+	</body>
+</html>

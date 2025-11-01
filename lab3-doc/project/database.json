@@ -1,0 +1,28 @@
+{
+  "todos": {
+    "1": {
+      "id": 1,
+      "task": "curl-test",
+      "completed": true,
+      "priority": "normal",
+      "category": "测试",
+      "due": "2025-10-25"
+    },
+    "2": {
+      "id": 2,
+      "task": "123",
+      "completed": true,
+      "priority": "normal",
+      "category": "学习",
+      "due": "2004-10-10"
+    }
+  },
+  "counter": 3,
+  "categories": [
+    "学习",
+    "工作",
+    "测试",
+    "生活",
+    "默认"
+  ]
+}
