@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: docker/training/Dockerfile
     volumes:
-      - model_storage: /app/models
+      - model_storage:/app/models
     # Set it to restart when it fails
     restart: on-failure
 
@@ -15,7 +15,7 @@ services:
       context: .
       dockerfile: docker/inference/Dockerfile
     volumes:
-      - model_storage: /app/models
+      - model_storage:/app/models
     ports:
       - "8080:8080" # Ensure that the inference service starts after the training service is complete
     depends_on:
