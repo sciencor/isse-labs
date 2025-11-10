@@ -11,5 +11,5 @@ COPY docker/training/train.py ./train.py
 # Store model in a shared volume
 VOLUME ["/app/models"]
 # TODO: Set the command to run the training script
-CMD [...]
+CMD ["python", "train.py"]
 
