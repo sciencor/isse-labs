@@ -8,5 +8,6 @@ API_KEY.env
 # history
 lab2-doc/
 lab3-doc/
+lab4-doc/
 # ignore __pycache__ folders
 **/__pycache__/
