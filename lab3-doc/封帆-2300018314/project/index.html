@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ToDoList 管理面板</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header class="app-header">
+    <h1>任务清单</h1>
+    <p class="subtitle">添加、筛选、排序并追踪每日待办</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>新增任务</h2>
+      <form id="taskForm" autocomplete="off">
+        <label class="field">
+          <span>标题 *</span>
+          <input type="text" id="titleInput" name="title" maxlength="100" required placeholder="例如：撰写周报" />
+        </label>
+        <div class="field-row">
+          <label class="field">
+            <span>分类</span>
+            <input type="text" id="categoryInput" name="category" placeholder="默认为 General" />
+          </label>
+          <label class="field">
+            <span>优先级</span>
+            <select id="priorityInput" name="priority">
+              <option value="high">高</option>
+              <option value="medium" selected>中</option>
+              <option value="low">低</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit" class="primary">添加任务</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>筛选与排序</h2>
+      <div class="filters">
+        <label>
+          状态
+          <select id="statusFilter">
+            <option value="all" selected>全部</option>
+            <option value="active">进行中</option>
+            <option value="completed">已完成</option>
+          </select>
+        </label>
+        <label>
+          分类
+          <input type="text" id="categoryFilter" placeholder="留空表示全部" />
+        </label>
+        <label>
+          排序字段
+          <select id="sortFilter">
+            <option value="created" selected>创建时间</option>
+            <option value="priority">优先级</option>
+          </select>
+        </label>
+        <label>
+          顺序
+          <select id="orderFilter">
+            <option value="desc" selected>降序</option>
+            <option value="asc">升序</option>
+          </select>
+        </label>
+        <button id="refreshBtn" class="secondary" type="button">刷新</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>任务列表</h2>
+        <div id="stats" class="stats">总数：0 ｜ 已完成：0</div>
+      </div>
+      <div id="loading" class="loading hidden">加载中...</div>
+      <div id="error" class="error hidden"></div>
+      <ul id="taskList" class="task-list"></ul>
+    </section>
+  </main>
+
+  <template id="taskItemTemplate">
+    <li class="task-item">
+      <label class="task-main">
+        <input type="checkbox" class="task-toggle" />
+        <span class="task-title"></span>
+      </label>
+      <div class="task-meta">
+        <span class="badge priority"></span>
+        <span class="badge category"></span>
+      </div>
+      <div class="task-times"></div>
+      <button class="delete-btn" type="button">删除</button>
+    </li>
+  </template>
+
+  <script src="script.js" defer></script>
+</body>
+
+</html>

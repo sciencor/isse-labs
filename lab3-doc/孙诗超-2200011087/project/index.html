@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待办事项管理系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 待办事项管理系统</h1>
+            <p>管理你的日常任务，提高工作效率</p>
+        </header>
+
+        <!-- 添加新待办事项的表单 -->
+        <div class="add-todo-form">
+            <h2>添加新任务</h2>
+            <form id="todo-form">
+                <div class="form-group">
+                    <label for="content">任务内容：</label>
+                    <input type="text" id="content" name="content" required placeholder="请输入任务内容">
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">分类：</label>
+                    <input type="text" id="category" name="category" placeholder="工作/学习/生活" value="默认">
+                </div>
+                
+                <div class="form-group">
+                    <label for="priority">优先级：</label>
+                    <select id="priority" name="priority">
+                        <option value="低">低</option>
+                        <option value="中" selected>中</option>
+                        <option value="高">高</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">添加任务</button>
+            </form>
+        </div>
+
+        <!-- 待办事项列表 -->
+        <div class="todo-list">
+            <h2>待办事项列表</h2>
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label>状态筛选：</label>
+                    <button class="btn btn-secondary" onclick="filterTodos('all')">全部</button>
+                    <button class="btn btn-secondary" onclick="filterTodos('active')">未完成</button>
+                    <button class="btn btn-secondary" onclick="filterTodos('completed')">已完成</button>
+                </div>
+                
+                <div class="filter-group">
+                    <label>优先级筛选：</label>
+                    <button class="btn btn-secondary" onclick="filterByPriority('all')">全部</button>
+                    <button class="btn btn-secondary" onclick="filterByPriority('高')">高优先级</button>
+                    <button class="btn btn-secondary" onclick="filterByPriority('中')">中优先级</button>
+                    <button class="btn btn-secondary" onclick="filterByPriority('低')">低优先级</button>
+                </div>
+                
+                <div class="filter-group">
+                    <label>分类筛选：</label>
+                    <select id="category-filter" onchange="filterByCategory(this.value)">
+                        <option value="all">全部分类</option>
+                        <!-- 分类选项将动态加载 -->
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <button class="btn btn-secondary" onclick="clearFilters()">清除筛选</button>
+                </div>
+            </div>
+            
+            <div id="todo-items" class="todo-items">
+                <!-- 待办事项将动态加载到这里 -->
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="stats">
+            <h3>统计信息</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="total-todos">0</span>
+                    <span class="stat-label">总任务数</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="completed-todos">0</span>
+                    <span class="stat-label">已完成</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="pending-todos">0</span>
+                    <span class="stat-label">待完成</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

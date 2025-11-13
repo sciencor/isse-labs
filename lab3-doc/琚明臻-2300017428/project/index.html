@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDoList - 任务管理应用</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 页面标题 -->
+        <header class="header">
+            <h1>📝 ToDoList</h1>
+            <p class="subtitle">高效管理您的任务</p>
+        </header>
+
+        <!-- 添加任务表单 -->
+        <section class="add-task-section">
+            <h2>添加新任务</h2>
+            <form id="addTaskForm" class="task-form">
+                <div class="form-group">
+                    <label for="taskTitle">任务标题 *</label>
+                    <input type="text" id="taskTitle" name="title" placeholder="请输入任务标题" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDescription">任务描述</label>
+                    <textarea id="taskDescription" name="description" placeholder="请输入任务描述（可选）" rows="3"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskPriority">优先级 *</label>
+                        <select id="taskPriority" name="priority" required>
+                            <option value="">请选择优先级</option>
+                            <option value="low">低</option>
+                            <option value="medium">中</option>
+                            <option value="high">高</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="taskCategory">分类 *</label>
+                        <input type="text" id="taskCategory" name="category" placeholder="如：工作、学习、生活" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-icon">➕</span>
+                    添加任务
+                </button>
+            </form>
+        </section>
+
+        <!-- 筛选和统计区域 -->
+        <section class="filter-section">
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label for="priorityFilter">按优先级筛选：</label>
+                    <select id="priorityFilter">
+                        <option value="">全部</option>
+                        <option value="high">高</option>
+                        <option value="medium">中</option>
+                        <option value="low">低</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="categoryFilter">按分类筛选：</label>
+                    <input type="text" id="categoryFilter" placeholder="输入分类名称">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="statusFilter">按状态筛选：</label>
+                    <select id="statusFilter">
+                        <option value="">全部</option>
+                        <option value="pending">未完成</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                </div>
+                
+                <button id="clearFilters" class="btn btn-secondary">
+                    <span class="btn-icon">🔄</span>
+                    清除筛选
+                </button>
+            </div>
+            
+            <div class="task-stats">
+                <div class="stat-item">
+                    <span class="stat-label">总任务：</span>
+                    <span id="totalTasks" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">已完成：</span>
+                    <span id="completedTasks" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">完成率：</span>
+                    <span id="completionRate" class="stat-value">0%</span>
+                </div>
+                <button id="clearCompleted" class="btn btn-danger">
+                    <span class="btn-icon">🗑️</span>
+                    清空已完成
+                </button>
+            </div>
+        </section>
+
+        <!-- 任务列表区域 -->
+        <section class="tasks-section">
+            <div class="tasks-header">
+                <h2>任务列表</h2>
+                <div class="tasks-controls">
+                    <button id="refreshTasks" class="btn btn-outline">
+                        <span class="btn-icon">🔄</span>
+                        刷新
+                    </button>
+                    <button id="toggleAllTasks" class="btn btn-outline">
+                        <span class="btn-icon">✅</span>
+                        全选/取消全选
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 加载状态 -->
+            <div id="loadingIndicator" class="loading-indicator">
+                <div class="spinner"></div>
+                <span>加载中...</span>
+            </div>
+            
+            <!-- 空状态提示 -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon">📝</div>
+                <h3>暂无任务</h3>
+                <p>点击上方"添加任务"按钮创建您的第一个任务吧！</p>
+            </div>
+            
+            <!-- 任务列表容器 -->
+            <div id="tasksList" class="tasks-list">
+                <!-- 任务项将通过JavaScript动态生成 -->
+            </div>
+        </section>
+
+        <!-- 错误提示模态框 -->
+        <div id="errorModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>❌ 错误</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorMessage">发生了一个错误</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="errorModalClose" class="btn btn-primary">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 确认删除模态框 -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>⚠️ 确认删除</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>确定要删除这个任务吗？此操作无法撤销。</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="deleteConfirm" class="btn btn-danger">删除</button>
+                    <button id="deleteCancel" class="btn btn-secondary">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 成功提示 -->
+        <div id="successToast" class="toast">
+            <span class="toast-icon">✅</span>
+            <span class="toast-message">操作成功！</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

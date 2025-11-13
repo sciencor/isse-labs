@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>TodoList</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body data-theme="light">
+<div class="app">
+    <header>
+        <h2>TodoList</h2>
+        <div class="theme-toggle">
+            <label>
+                <input id="themeSwitch" type="checkbox"/> 夜间模式
+            </label>
+        </div>
+    </header>
+
+    <section class="card">
+        <div class="input-row">
+            <input id="titleInput" type="text" placeholder="输入待办事项标题" />
+            <select id="categorySelect">
+                <option value="">分类: 无</option>
+                <option>学习</option>
+                <option>工作</option>
+                <option>生活</option>
+            </select>
+            <select id="prioritySelect">
+                <option value="">优先级: 无</option>
+                <option value="low">低</option>
+                <option value="medium">中</option>
+                <option value="high">高</option>
+            </select>
+            <input id="dueInput" type="datetime-local" />
+            <button id="addBtn">添加任务</button>
+            <button id="clearBtn" class="ghost">清空输入</button>
+        </div>
+
+        <div style="margin-top:10px;" class="controls">
+            <div>
+                排序:
+                <select id="sortSelect">
+                    <option value="name_asc">按字典名称 ↑</option>
+                    <option value="name_desc">按字典名称 ↓</option>
+                    <option value="created_asc">按创建时间 ↑</option>
+                    <option value="created_desc">按创建时间 ↓</option>
+                    <option value="due_asc">按结束时间 ↑</option>
+                    <option value="due_desc">按结束时间 ↓</option>
+                    <option value="priority">按优先级 高→低</option>
+                </select>
+            </div>
+            <div class="muted" style="margin-left:8px;">（未完成灰色，已完成删除线，星级★，红旗🚩置顶）</div>
+        </div>
+    </section>
+
+    <main>
+        <section class="card">
+            <div class="tasks" id="tasksContainer">
+                <!-- 任务项由JS渲染 -->
+            </div>
+        </section>
+
+        <footer class="card">
+            <div class="filters">
+                筛选:
+                <select id="filterCategory">
+                    <option value="">全部分类</option>
+                    <option>学习</option>
+                    <option>工作</option>
+                    <option>生活</option>
+                </select>
+                <select id="filterPriority">
+                    <option value="">全部优先级</option>
+                    <option value="high">高</option>
+                    <option value="medium">中</option>
+                    <option value="low">低</option>
+                </select>
+            </div>
+            <div>
+                <button id="refreshBtn" class="ghost">刷新</button>
+            </div>
+        </footer>
+    </main>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的待办清单 - TodoList</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部区域 -->
+        <header>
+            <h1>📝 我的待办清单</h1>
+            <div class="stats" id="stats">
+                <div class="stat-item">
+                    <span class="stat-label">总任务</span>
+                    <span class="stat-value" id="totalCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">已完成</span>
+                    <span class="stat-value" id="completedCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">未完成</span>
+                    <span class="stat-value" id="pendingCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">完成率</span>
+                    <span class="stat-value" id="completionRate">0%</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 添加任务表单 -->
+        <section class="add-section">
+            <h2>添加新任务</h2>
+            <div class="form-group">
+                <input 
+                    type="text" 
+                    id="title" 
+                    placeholder="请输入任务标题（必填）" 
+                    maxlength="100"
+                    autocomplete="off"
+                >
+            </div>
+            <div class="form-group">
+                <textarea 
+                    id="description" 
+                    placeholder="任务描述（可选）" 
+                    rows="3"
+                    maxlength="500"
+                ></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="priority">优先级</label>
+                    <select id="priority">
+                        <option value="high">🔴 高优先级</option>
+                        <option value="medium" selected>🟡 中优先级</option>
+                        <option value="low">🟢 低优先级</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="category">分类</label>
+                    <select id="category">
+                        <option value="work">💼 工作</option>
+                        <option value="study" selected>📚 学习</option>
+                        <option value="life">🏠 生活</option>
+                        <option value="other">📌 其他</option>
+                    </select>
+                </div>
+            </div>
+            <button id="addBtn" class="btn btn-primary">
+                ➕ 添加任务
+            </button>
+        </section>
+
+        <!-- 筛选区域 -->
+        <section class="filter-section">
+            <h2>筛选任务</h2>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="filterPriority">优先级</label>
+                    <select id="filterPriority">
+                        <option value="">全部优先级</option>
+                        <option value="high">🔴 高优先级</option>
+                        <option value="medium">🟡 中优先级</option>
+                        <option value="low">🟢 低优先级</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterCategory">分类</label>
+                    <select id="filterCategory">
+                        <option value="">全部分类</option>
+                        <option value="work">💼 工作</option>
+                        <option value="study">📚 学习</option>
+                        <option value="life">🏠 生活</option>
+                        <option value="other">📌 其他</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterStatus">状态</label>
+                    <select id="filterStatus">
+                        <option value="">全部状态</option>
+                        <option value="pending">⏳ 未完成</option>
+                        <option value="completed">✅ 已完成</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- 任务列表 -->
+        <section class="todo-section">
+            <h2>任务列表</h2>
+            <div class="todo-list" id="todoList">
+                <!-- 任务卡片将通过 JavaScript 动态生成 -->
+                <div class="empty-state" id="emptyState">
+                    <p>📭 还没有任务，快来添加第一个任务吧！</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 消息提示容器 -->
+    <div id="toast" class="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

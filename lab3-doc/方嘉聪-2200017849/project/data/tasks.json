@@ -1,0 +1,28 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "软件设计实践大作业",
+      "category": "学习",
+      "priority": "高",
+      "completed": true,
+      "due_date": "2025-10-21T20:37:00"
+    },
+    {
+      "id": 2,
+      "title": "摸鱼",
+      "category": "生活",
+      "priority": "低",
+      "completed": false,
+      "due_date": "2025-10-22T20:38:00"
+    },
+    {
+      "id": 3,
+      "title": "快乐生活 :-) :-)",
+      "category": "生活",
+      "priority": "高",
+      "completed": false,
+      "due_date": "2026-02-27T20:38:00"
+    }
+  ]
+}
