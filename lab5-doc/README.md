@@ -44,7 +44,7 @@ docker run --rm -v model_storage:/app/models isse-training
 ```bash
 docker build -t isse-inference -f docker/inference/Dockerfile .
 docker run --rm -p 8080:8080 -v model_storage:/app/models isse-inference
-curl -X POST http://localhost:8080/predict -H 'Content-Type: application/json' -d '{"input":[6.3,3.3,6,2.5]}
+curl -X POST http://localhost:8080/predict -H 'Content-Type: application/json' -d '{"input":[6.3,3.3,6,2.5]}'
 ```
 
 你也可以发送一个坏请求，测试错误处理功能
@@ -59,4 +59,3 @@ curl -X POST http://localhost:8080/predict -H 'Content-Type: application/json' -
 
 1. 所有代码文件
 2. 一张截图，显示你已正确通过 docker 启动服务并正常工作
-

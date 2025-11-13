@@ -7,10 +7,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY docker/inference/server.py ./server.py
 
-ENV MODEL_DIR=/app/models
 VOLUME ["/app/models"]
 
+ENV MODEL_DIR=/app/models
 EXPOSE 8080
-
 CMD ["python", "server.py"]
-

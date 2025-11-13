@@ -12,7 +12,7 @@ clf = SVC()
 model = clf.fit(iris.data, iris.target_names[iris.target])
 
 # TODO: Save the trained model to the shared volume (make sure to use the correct path)
-joblib.dump(model, '...')
+joblib.dump(model, '/app/models/iris_model.pkl')
 
 print("Model training complete and saved as iris_model.pkl")
 
