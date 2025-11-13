@@ -5,11 +5,11 @@ FROM docker.m.daocloud.io/python:3.9-slim
 WORKDIR /app
 
 # Copy requirements.txt and install dependencies
-COPY requirements.txt .
+COPY docker/inference/requirements.txt .
 RUN pip install -r requirements.txt
 
 # docker build -t isse-inference ./docker/inference
-COPY server.py ./server.py
+COPY docker/inference/server.py ./server.py
 
 # Expose port
 EXPOSE 8080
