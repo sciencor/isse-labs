@@ -9,13 +9,12 @@
 
 ## 目录结构
 
-按题目要求放置（示例使用「李华-230111234」作为学号与姓名标识，实际请替换为你自己的）：
-
 ```
 
 lab3-doc/
-└── 李华-230111234/
+└── 白晨旭-2300011172/
 ├── prompt.txt
+├── ai_generated_prompt.txt     # 由ChatGPT-5生成的prompt
 ├── screenshot.png              # 运行后自行截图放这里
 ├── README.md                   # 本文件
 └── project/
