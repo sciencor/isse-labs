@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  training:
+    build:
+      context: .
+      dockerfile: docker/training/Dockerfile
+    volumes:
+      - model_storage:/app/models
+    # Set it to restart when it fails
+    restart: on-failure
+
+  inference:
+    build:
+      context: .
+      dockerfile: docker/inference/Dockerfile
+    volumes:
+      - model_storage:/app/models
+    ports:
+      - "8080:8080"
+    # Ensure that the inference service starts after the training service is complete
+    depends_on:
+      - training
+    restart: on-failure
+
+#Define a shared volume for the model file
+volumes:
+  model_storage:
+    driver: local
