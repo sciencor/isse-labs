@@ -1,0 +1,9 @@
+由于powershell的特点及其他原因，有一些终端指令和README不同，标记在此
+- 测试指令：在git-bash上完成
+ curl -X POST http://localhost:8080/predict -H 'Content-Type: application/json' -d '{"input":[6.3,3.3,6,2.5]}'
+ * powershell上会有奇怪的引号转义错误，在git-bash上比较好
+ * README中似乎少了结尾的单引号
+- 最终Docker-compose化：
+ $env:DOCKER_BUILDKIT="0" ; docker-compose up --build
+ * 这个是由于地址中含有中文符号，直接运行会显示报错
+
