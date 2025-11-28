@@ -59,3 +59,4 @@ curl -X POST http://localhost:8080/predict -H 'Content-Type: application/json' -
 
 1. 所有代码文件
 2. 一张截图，显示你已正确通过 docker 启动服务并正常工作
+
