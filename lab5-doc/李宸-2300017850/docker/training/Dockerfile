@@ -1,5 +1,5 @@
 # Base image
-FROM python:3.9-slim
+FROM docker.m.daocloud.io/python:3.9-slim
 
 # Setup working directory
 WORKDIR /app
@@ -11,5 +11,5 @@ COPY docker/training/train.py ./train.py
 # Store model in a shared volume
 VOLUME ["/app/models"]
 # TODO: Set the command to run the training script
-ENV MODEL_DIR=/app/models
 CMD ["python", "train.py"]
+
