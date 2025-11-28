@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # 训练服务
+  training:
+    build:
+      context: .
+      dockerfile: docker/training/Dockerfile
+    volumes:
+      - model_storage:/app/models
+    container_name: isse-training
+    restart: "no"  # 训练完成后不重启
+
+  # 推理服务
+  inference:
+    build:
+      context: .
+      dockerfile: docker/inference/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - model_storage:/app/models
+    container_name: isse-inference
+    depends_on:
+      - training
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# 定义共享卷
+volumes:
+  model_storage:
+    driver: local
