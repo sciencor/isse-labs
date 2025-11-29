@@ -4,27 +4,20 @@ import joblib
 
 app = Flask(__name__)
 
-# Load the trained model from the shared volume
-model = joblib.load('/app/models/iris_model.pkl')
+# TODO: Load the trained model from the shared volume (use the correct path)
+model = ...
 
-# Add request method to predict
-@app.route('/predict', methods=['POST'])
+# TODO: Add request method to predict
+@app.route('/predict', methods=[''])
 def predict():
-    # Get the input array from the request body and make prediction using the model
-    try:
-        get_json = request.get_json()
-        iris_input = get_json.get('input')
-        
-        if iris_input is None:
-            return jsonify({'error': 'No input provided'}), 400
+    # TODO: Get the input array from the request body and make prediction using the model
+    get_json = request.get_json()
+    iris_input = ...
 
-        # HINT: use np.array().reshape(1, -1) to convert input to 2D array
-        iris_array = np.array(iris_input).reshape(1, -1)
-        prediction = model.predict(iris_array)
+    # HINT: use np.array().reshape(1, -1) to convert input to 2D array
+    prediction = ...
 
-        return jsonify({'prediction': prediction.tolist()})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
+    return ...
 
 @app.route('/')
 def hello():
