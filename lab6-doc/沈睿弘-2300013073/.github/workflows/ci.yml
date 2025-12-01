@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: [self-hosted, Linux, X64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Python
+        run: |
+          python3 --version
+
+      - name: Set up venv
+        run: |
+          python3 -m venv .venv
+          echo "PYTHON=$(pwd)/.venv/bin/python" >> $GITHUB_ENV
+          "$PWD/.venv/bin/python" -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: |
+          "$PYTHON" -m pip install -r requirements.txt
+
+      - name: Run tests with coverage
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          "$PYTHON" -m pytest -q --cov=prediction_pipeline_demo --cov-report=term-missing --cov-fail-under=70
+
+      - name: Run demo pipeline end-to-end
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          "$PYTHON" prediction_pipeline_demo.py
