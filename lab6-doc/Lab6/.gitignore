@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints
+
+# VS Code and IDEs
+.vscode/
+.idea/
+*.swp
+
+# pytest
+.cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build / dist
+build/
+dist/
+*.egg-info/
+
+# Data files (keep Housing.csv but ignore others)
+*.csv
+!Housing.csv
+
+# Self-hosted runner 相关文件
+actions-runner/
+.github/actions/
+.github/workflows/actions-runner/
+
+# Python相关
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+
+# Coverage reports
+.coverage
+.coverage.*
+htmlcov/
