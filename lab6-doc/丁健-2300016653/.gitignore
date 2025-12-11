@@ -42,3 +42,4 @@ dist/
 !Housing.csv
 
 # Github Actions
+actions-runner
