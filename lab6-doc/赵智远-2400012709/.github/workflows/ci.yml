@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: self-hosted  # 也可以改为 windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        shell: powershell
+        run: |
+          python -m pip install --upgrade pip
+          # 检查文件是否存在再安装，防止报错（可选，视项目情况而定）
+          if (Test-Path requirements.txt) {
+            pip install -r requirements.txt
+          } else {
+            Write-Host "No requirements.txt found."
+          }
+
+      - name: Run tests with coverage
+        env:
+          # GitHub Actions 会自动将此映射为当前 Session 的环境变量
+          PYTHONPATH: ${{ github.workspace }}
+        shell: powershell
+        # 注意：PowerShell 的换行续行符是反引号 ` 而不是 Linux 的 \
+        run: |
+          python -m pytest -q `
+            --cov=prediction_pipeline_demo `
+            --cov-report=term-missing `
+            --cov-fail-under=70
+
+      - name: Run demo pipeline end to end
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        shell: powershell
+        run: python prediction_pipeline_demo.py
