@@ -3,7 +3,8 @@
 .env
 *.pdf
 API_KEY.env
-.DS_Store 
+.DS_Store
+.vscode
 
 # history
 lab2-doc/
