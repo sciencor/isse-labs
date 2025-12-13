@@ -59,8 +59,8 @@ def test_data_split_returns_four_parts(feature_target_sample):
     parts = data_split(*feature_target_sample)
     # TODO(2): 增加断言，检测：
     #   - parts 是元组(tuple)
-    #   - 元组有四个元素
     assert isinstance(parts, tuple)
+    #   - 元组有四个元素
     assert len(parts) == 4
     
 
