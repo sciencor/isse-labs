@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  training:
+    build:
+      context: .
+      dockerfile: docker/training/Dockerfile
+    volumes:
+      - model_storage:/app/models
+    restart: "no"
+
+  inference:
+    build:
+      context: .
+      dockerfile: docker/inference/Dockerfile
+    volumes:
+      - model_storage:/app/models
+    ports:
+      - "8080:8080"
+    depends_on:
+      - training
+    restart: unless-stopped
+
+volumes:
+  model_storage:
