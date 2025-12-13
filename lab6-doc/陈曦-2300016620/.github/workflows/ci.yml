@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: self-hosted  # 改为使用自托管运行器
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Python  # 替换Set up Python步骤
+        run: |
+          echo "显示本地Python版本:"
+          python3 --version
+          python --version
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests with coverage
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -m pytest -q --cov=prediction_pipeline_demo --cov-report=term-missing --cov-fail-under=70
+
+      - name: Run demo pipeline end-to-end
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          echo "开始运行端到端ML流水线..."
+          python prediction_pipeline_demo.py
+          echo "流水线执行完成！"
